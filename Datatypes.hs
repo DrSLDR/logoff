@@ -25,3 +25,18 @@ data Polar = Positive Formula
 
 -- Focus datatype
 data Focused = Focused Polar
+
+-- Input structure datatype
+data IStructure = IStructure Polar
+  | STensor IStructure IStructure
+  | SRDiff IStructure OStructure
+  | SLDiff OStructure IStructure
+
+-- Output structure datatype
+data OStructure = OStructure Polar
+  | SSum OStructure OStructure
+  | SRDiv OStructure IStructure
+  | SLDiv IStructure OStructure
+
+-- Sequent datatype
+data Sequent = Sequent IStructure OStructure
