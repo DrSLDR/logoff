@@ -18,6 +18,7 @@ data Formula = Atomic Atom
   | Sum Formula Formula
   | RDiv Formula Formula
   | LDiv Formula Formula
+  deriving (Eq)
 
 -- Polarity datatype
 data Polar = Positive Formula
