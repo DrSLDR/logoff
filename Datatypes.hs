@@ -28,12 +28,14 @@ data Focused = Focused Polar
 
 -- Input structure datatype
 data IStructure = IStructure Polar
+  | IStructureF Focused
   | STensor IStructure IStructure
   | SRDiff IStructure OStructure
   | SLDiff OStructure IStructure
 
 -- Output structure datatype
 data OStructure = OStructure Polar
+  | OStructureF Polar
   | SSum OStructure OStructure
   | SRDiv OStructure IStructure
   | SLDiv IStructure OStructure
