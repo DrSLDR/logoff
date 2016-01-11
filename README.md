@@ -24,10 +24,10 @@ Proof searcher for Focused Lambek-Grishin (LGf) calculus
   - [x] Fundamental LGf datatypes
   - [ ] Proof-tree representation
   - [ ] Lexicon representation
-- [ ] Testing framework
+- [x] Testing framework
   - [x] Fundamental testcases
-  - [ ] Verbose testing output
-  - [ ] "Easily" extensible framework
+  - [x] Verbose testing output
+  - [x] "Easily" extensible framework
 - [x] Travis integration
 - [ ] Bottom-up proofing algorithm
 - There will be more...
