@@ -1,6 +1,3 @@
 language: haskell
 notifications:
   email: false
-
-after_script:
-  cat dist/test/logoff-0.0-testsuite.log

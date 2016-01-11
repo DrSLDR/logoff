@@ -1,15 +1,13 @@
 # logoff
 Proof searcher for Focused Lambek-Grishin (LGf) calculus
 
-![](https://travis-ci.org/DrSLDR/logoff.svg?branch=master)
+[![](https://travis-ci.org/DrSLDR/logoff.svg?branch=master)](https://travis-ci.org/DrSLDR/logoff)
 
 ---
 
 ## Features:
 
-- Bugger
-- All
-- A halfway-functioning testing framework
+- A functioning testing framework (v0.1)
 
 ## Planned features:
 
