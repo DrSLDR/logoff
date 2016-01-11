@@ -24,12 +24,9 @@ data Formula = Atomic Atom
 data Polar = Positive Formula
   | Negative Formula
 
--- Focus datatype
-data Focused = Focused Polar
-
 -- Input structure datatype
 data IStructure = IStructure Polar
-  | IStructureF Focused
+  | IStructureF Polar
   | STensor IStructure IStructure
   | SRDiff IStructure OStructure
   | SLDiff OStructure IStructure
