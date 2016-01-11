@@ -3,11 +3,15 @@
 -- Actual unit testing frameworks are for scrubs
 -}
 
-module Testcases where
-
 import Logoff
 import Datatypes
 
+{------------------------------------------------------------------------------}
+-- Dummy main function
+main :: IO ()
+main = putStrLn "Hello World"
+
+{------------------------------------------------------------------------------}
 -- Sample Ax 1 - supposed to succeed
 ax_1 :: Sequent
 ax_1 = Sequent (IStructure (Positive (Atomic 'x')))
