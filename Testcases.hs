@@ -45,7 +45,7 @@ tests = axTests
 {------------------------------------------------------------------------------}
 -- Axiom block
 {------------------------------------------------------------------------------}
--- Sample Ax 1 - supposed to succeed
+-- Sample Ax 1 - Trivial, correct, atomic Ax-axiom
 ax_1 :: Test
 ax_1 = (ax_1_test, ax_1_intendedOutcome, ax_1_label)
 
@@ -59,7 +59,7 @@ ax_1_test :: Bool
 ax_1_test = isAx (Sequent (IStructure (Positive (Atomic 'x')))
   (OStructureF (Positive (Atomic 'x'))))
 {------------------------------------------------------------------------------}
--- Sample Ax 2 - supposed to fail
+-- Sample Ax 2 - Simple, non-matching atomic Ax-axiom
 ax_2 :: Test
 ax_2 = (ax_2_test, ax_2_intendedOutcome, ax_2_label)
 
@@ -73,7 +73,7 @@ ax_2_test :: Bool
 ax_2_test = isAx (Sequent (IStructure (Positive (Atomic 'x')))
   (OStructureF (Positive (Atomic 'y'))))
 {------------------------------------------------------------------------------}
--- Sample Ax 3 - supposed to fail
+-- Sample Ax 3 - Simple, non-focused, matching Ax-axiom
 ax_3 :: Test
 ax_3 = (ax_3_test, ax_3_intendedOutcome, ax_3_label)
 
@@ -87,6 +87,20 @@ ax_3_test :: Bool
 ax_3_test = isAx (Sequent (IStructure (Positive (Atomic 'x')))
   (OStructure (Positive (Atomic 'x'))))
 {------------------------------------------------------------------------------}
+-- Sample Ax 4 - Simple, atom-to-non-atom Ax-axiom
+ax_4 :: Test
+ax_4 = (ax_4_test, ax_4_intendedOutcome, ax_4_label)
+
+ax_4_label :: String
+ax_4_label = "Trivial Ax-4"
+
+ax_4_intendedOutcome :: Bool
+ax_4_intendedOutcome = False
+
+ax_4_test :: Bool
+ax_4_test = isAx (Sequent (IStructure (Positive (Atomic 'x')))
+  (OStructureF (Positive (Tensor (Atomic 'x') (Atomic 'x')))))
+{------------------------------------------------------------------------------}
 -- Ax test list
 axTests :: [Test]
-axTests = [ax_1,ax_2,ax_3]
+axTests = [ax_1,ax_2,ax_3,ax_4]
