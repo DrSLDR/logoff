@@ -11,12 +11,12 @@ import System.Exit
 {------------------------------------------------------------------------------}
 -- Framework operative block
 {------------------------------------------------------------------------------}
--- Dummy main function
+-- main function
 main :: IO ()
 main = do
   result <- ioize res
   unless (evaluateResult res) exitFailure
-  where res = map evaluateTest axTests
+  where res = map evaluateTest tests
 
 -- Testing datatype
 type Test = (Bool,Bool,String)
