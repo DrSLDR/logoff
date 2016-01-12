@@ -6,7 +6,7 @@ module Datatypes where
 -- Datatypes for LGf sequents
 {------------------------------------------------------------------------------}
 -- Atomic type
-type Atom = Char
+type Atom = String
 
 -- Formula datatype
 -- Covers both input and output (non-structural) formulae
