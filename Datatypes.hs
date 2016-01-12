@@ -23,6 +23,7 @@ data Formula = Atomic Atom
 -- Polarity datatype
 data Polar = Positive Formula
   | Negative Formula
+  deriving (Eq)
 
 -- Input structure datatype
 data IStructure = IStructure Polar
