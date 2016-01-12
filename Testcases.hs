@@ -120,7 +120,7 @@ coAx_2 = (isCoAx
     (IStructureF
       (Negative (Atomic 'x')))
     (OStructure
-      (Negative (Atomic 'y'))))
+      (Negative (Atomic 'y')))),
   False,
   "Trivial CoAx-2"
   )
@@ -132,7 +132,7 @@ coAx_3 = (isCoAx
     (IStructure
       (Negative (Atomic 'x')))
     (OStructure
-      (Negative (Atomic 'x'))))
+      (Negative (Atomic 'x')))),
   False,
   "Trivial CoAx-3"
   )
@@ -146,7 +146,7 @@ coAx_4 = (isCoAx
     (OStructure
       (Positive (Tensor
         (Negative (Atomic 'x'))
-        (Negative (Atomic 'x'))))))
+        (Negative (Atomic 'x')))))),
   False,
   "Trivial CoAx-4"
   )
