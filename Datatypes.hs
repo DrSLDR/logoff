@@ -2,10 +2,9 @@
 -- Datatype soup
 -}
 module Datatypes where
-{-
+{------------------------------------------------------------------------------}
 -- Datatypes for LGf sequents
--}
-
+{------------------------------------------------------------------------------}
 -- Atomic type
 type Atom = Char
 
@@ -41,3 +40,12 @@ data OStructure = OStructure Polar
 
 -- Sequent datatype
 data Sequent = Sequent IStructure OStructure
+
+{------------------------------------------------------------------------------}
+-- Datatypes for Lexicons
+{------------------------------------------------------------------------------}
+-- Lexical item type
+type LexItem = (String, Polar)
+
+-- Lexicon type
+type Lexicon = [LexItem]

@@ -51,9 +51,9 @@ ax_1 :: Test
 ax_1 = (isAx
   (Sequent
     (IStructure
-      (Positive (Atomic 'x')))
+      (Positive (Atomic "x")))
     (OStructureF
-      (Positive (Atomic 'x')))),
+      (Positive (Atomic "x")))),
   True,
   "Trivial Ax-1"
   )
@@ -64,9 +64,9 @@ ax_2 :: Test
 ax_2 = (isAx
   (Sequent
     (IStructure
-      (Positive (Atomic 'x')))
+      (Positive (Atomic "x")))
     (OStructureF
-      (Positive (Atomic 'y')))),
+      (Positive (Atomic "y")))),
   False,
   "Trivial Ax-2"
   )
@@ -77,9 +77,9 @@ ax_3 :: Test
 ax_3 = (isAx
   (Sequent
     (IStructure
-      (Positive (Atomic 'x')))
+      (Positive (Atomic "x")))
     (OStructure
-      (Positive (Atomic 'x')))),
+      (Positive (Atomic "x")))),
   False,
   "Trivial Ax-3"
   )
@@ -90,11 +90,11 @@ ax_4 :: Test
 ax_4 = (isAx
   (Sequent
     (IStructure
-      (Positive (Atomic 'x')))
+      (Positive (Atomic "x")))
     (OStructureF
       (Positive (Tensor
-        (Positive (Atomic 'x'))
-        (Positive (Atomic 'x')))))),
+        (Positive (Atomic "x"))
+        (Positive (Atomic "x")))))),
   False,
   "Trivial Ax-4"
   )
@@ -105,9 +105,9 @@ coAx_1 :: Test
 coAx_1 = (isCoAx
   (Sequent
     (IStructureF
-      (Negative (Atomic 'x')))
+      (Negative (Atomic "x")))
     (OStructure
-      (Negative (Atomic 'x')))),
+      (Negative (Atomic "x")))),
   True,
   "Trivial CoAx-1"
   )
@@ -118,9 +118,9 @@ coAx_2 :: Test
 coAx_2 = (isCoAx
   (Sequent
     (IStructureF
-      (Negative (Atomic 'x')))
+      (Negative (Atomic "x")))
     (OStructure
-      (Negative (Atomic 'y')))),
+      (Negative (Atomic "y")))),
   False,
   "Trivial CoAx-2"
   )
@@ -130,9 +130,9 @@ coAx_3 :: Test
 coAx_3 = (isCoAx
   (Sequent
     (IStructure
-      (Negative (Atomic 'x')))
+      (Negative (Atomic "x")))
     (OStructure
-      (Negative (Atomic 'x')))),
+      (Negative (Atomic "x")))),
   False,
   "Trivial CoAx-3"
   )
@@ -142,11 +142,11 @@ coAx_4 :: Test
 coAx_4 = (isCoAx
   (Sequent
     (IStructureF
-      (Negative (Atomic 'x')))
+      (Negative (Atomic "x")))
     (OStructure
       (Positive (Tensor
-        (Negative (Atomic 'x'))
-        (Negative (Atomic 'x')))))),
+        (Negative (Atomic "x"))
+        (Negative (Atomic "x")))))),
   False,
   "Trivial CoAx-4"
   )
