@@ -8,32 +8,31 @@ module Datatypes where
 -- Atomic type
 type Atom = String
 
--- Formula datatype
--- Covers both input and output (non-structural) formulae
-data Formula = Atomic Atom
-  | Tensor Polar Polar
-  | RDiff Polar Polar
-  | LDiff Polar Polar
-  | Sum Polar Polar
-  | RDiv Polar Polar
-  | LDiv Polar Polar
-  deriving (Eq)
+-- Generic formula datatype
+data Formula a = P PFormula
+  | N NFormula
 
--- Polarity datatype
-data Polar = Positive Formula
-  | Negative Formula
-  deriving (Eq)
+-- Positive formula datatype
+data PFormula = Positive Atom
+  | Tensor (Formula a) (Formula a)
+  | RDiff (Formula a) (Formula a)
+  | LDiff (Formula a) (Formula a)
+
+data NFormula = Negative Atom
+  | Sum (Formula a) (Formula a)
+  | RDiv (Formula a) (Formula a)
+  | LDiv (Formula a) (Formula a)
 
 -- Input structure datatype
-data IStructure = IStructure Polar
-  | IStructureF Polar
+data IStructure = IStructure (Formula a)
+  | IStructureF NFormula
   | STensor IStructure IStructure
   | SRDiff IStructure OStructure
   | SLDiff OStructure IStructure
 
 -- Output structure datatype
-data OStructure = OStructure Polar
-  | OStructureF Polar
+data OStructure = OStructure (Formula a)
+  | OStructureF PFormula
   | SSum OStructure OStructure
   | SRDiv OStructure IStructure
   | SLDiv IStructure OStructure
