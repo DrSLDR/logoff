@@ -3,4 +3,4 @@ notifications:
   email: false
 
 after_script:
-  cat dist/test/logoff-0.0-testsuite.log
+  cat dist/test/logoff-*-testsuite.log
