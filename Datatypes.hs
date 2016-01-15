@@ -9,30 +9,30 @@ module Datatypes where
 type Atom = String
 
 -- Generic formula datatype
-data Formula a = P PFormula
+data Formula = P PFormula
   | N NFormula
 
 -- Positive formula datatype
 data PFormula = Positive Atom
-  | Tensor (Formula a) (Formula a)
-  | RDiff (Formula a) (Formula a)
-  | LDiff (Formula a) (Formula a)
+  | Tensor Formula Formula
+  | RDiff Formula Formula
+  | LDiff Formula Formula
 
 data NFormula = Negative Atom
-  | Sum (Formula a) (Formula a)
-  | RDiv (Formula a) (Formula a)
-  | LDiv (Formula a) (Formula a)
+  | Sum Formula Formula
+  | RDiv Formula Formula
+  | LDiv Formula Formula
 
 -- Input structure datatype
-data IStructure = IStructure (Formula a)
-  | IStructureF NFormula
+data IStructure = IStruct Formula
+  | FIStruct NFormula
   | STensor IStructure IStructure
   | SRDiff IStructure OStructure
   | SLDiff OStructure IStructure
 
 -- Output structure datatype
-data OStructure = OStructure (Formula a)
-  | OStructureF PFormula
+data OStructure = OStruct Formula
+  | FOStruct PFormula
   | SSum OStructure OStructure
   | SRDiv OStructure IStructure
   | SLDiv IStructure OStructure
@@ -44,7 +44,7 @@ data Sequent = Sequent IStructure OStructure
 -- Datatypes for Lexicons
 {------------------------------------------------------------------------------}
 -- Lexical item type
-type LexItem = (String, Polar)
+type LexItem = (String, Formula)
 
 -- Lexicon type
 type Lexicon = [LexItem]
