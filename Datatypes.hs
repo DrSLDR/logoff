@@ -11,17 +11,20 @@ type Atom = String
 -- Generic formula datatype
 data Formula = P PFormula
   | N NFormula
+  deriving (Eq)
 
 -- Positive formula datatype
 data PFormula = Positive Atom
   | Tensor Formula Formula
   | RDiff Formula Formula
   | LDiff Formula Formula
+  deriving (Eq)
 
 data NFormula = Negative Atom
   | Sum Formula Formula
   | RDiv Formula Formula
   | LDiv Formula Formula
+  deriving (Eq)
 
 -- Input structure datatype
 data IStructure = IStruct Formula

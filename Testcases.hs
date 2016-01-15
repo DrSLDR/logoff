@@ -50,10 +50,10 @@ tests = axTests
 ax_1 :: Test
 ax_1 = (isAx
   (Sequent
-    (IStructure
-      (Positive (Atomic "x")))
-    (OStructureF
-      (Positive (Atomic "x")))),
+    (IStruct
+      (P (Positive "x")))
+    (FOStruct
+      (Positive "x"))),
   True,
   "Trivial Ax-1"
   )
@@ -63,10 +63,10 @@ ax_1 = (isAx
 ax_2 :: Test
 ax_2 = (isAx
   (Sequent
-    (IStructure
-      (Positive (Atomic "x")))
-    (OStructureF
-      (Positive (Atomic "y")))),
+    (IStruct
+      (P (Positive "x")))
+    (FOStruct
+      (Positive "y"))),
   False,
   "Trivial Ax-2"
   )
@@ -76,10 +76,10 @@ ax_2 = (isAx
 ax_3 :: Test
 ax_3 = (isAx
   (Sequent
-    (IStructure
-      (Positive (Atomic "x")))
-    (OStructure
-      (Positive (Atomic "x")))),
+    (IStruct
+      (P (Positive "x")))
+    (OStruct
+      (P (Positive "x")))),
   False,
   "Trivial Ax-3"
   )
@@ -89,12 +89,12 @@ ax_3 = (isAx
 ax_4 :: Test
 ax_4 = (isAx
   (Sequent
-    (IStructure
-      (Positive (Atomic "x")))
-    (OStructureF
-      (Positive (Tensor
-        (Positive (Atomic "x"))
-        (Positive (Atomic "x")))))),
+    (IStruct
+      (P (Positive "x")))
+    (FOStruct
+      (Tensor
+        (P (Positive "x"))
+        (P (Positive "x"))))),
   False,
   "Trivial Ax-4"
   )
@@ -104,10 +104,10 @@ ax_4 = (isAx
 coAx_1 :: Test
 coAx_1 = (isCoAx
   (Sequent
-    (IStructureF
-      (Negative (Atomic "x")))
-    (OStructure
-      (Negative (Atomic "x")))),
+    (FIStruct
+      (Negative "x"))
+    (OStruct
+      (N (Negative "x")))),
   True,
   "Trivial CoAx-1"
   )
@@ -117,36 +117,38 @@ coAx_1 = (isCoAx
 coAx_2 :: Test
 coAx_2 = (isCoAx
   (Sequent
-    (IStructureF
-      (Negative (Atomic "x")))
-    (OStructure
-      (Negative (Atomic "y")))),
+    (FIStruct
+      (Negative "x"))
+    (OStruct
+      (N (Negative "y")))),
   False,
   "Trivial CoAx-2"
   )
 {------------------------------------------------------------------------------}
 -- Trivial CoAx-3 - Simple, non-focused, matching Ax-axiom
+-- x- |- x-
 coAx_3 :: Test
 coAx_3 = (isCoAx
   (Sequent
-    (IStructure
-      (Negative (Atomic "x")))
-    (OStructure
-      (Negative (Atomic "x")))),
+    (IStruct
+      (N (Negative "x")))
+    (OStruct
+      (N (Negative "x")))),
   False,
   "Trivial CoAx-3"
   )
 {------------------------------------------------------------------------------}
 -- Trivial CoAx-4 - Simple, atom-to-non-atom Ax-axiom
+-- [(x- (sum) x-)-] |- x-
 coAx_4 :: Test
 coAx_4 = (isCoAx
   (Sequent
-    (IStructureF
-      (Negative (Atomic "x")))
-    (OStructure
-      (Positive (Tensor
-        (Negative (Atomic "x"))
-        (Negative (Atomic "x")))))),
+    (FIStruct
+      (Sum
+        (N (Negative "x"))
+        (N (Negative "x"))))
+    (OStruct
+      (N (Negative "x")))),
   False,
   "Trivial CoAx-4"
   )
