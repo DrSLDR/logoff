@@ -40,7 +40,7 @@ evaluateResult = all fst
 
 -- Master test list
 tests :: [Test]
-tests = axTests
+tests = axTests ++ focusTests
 
 {------------------------------------------------------------------------------}
 -- Axiom block
@@ -156,3 +156,28 @@ coAx_4 = (isCoAx
 -- Ax test list
 axTests :: [Test]
 axTests = [ax_1,ax_2,ax_3,ax_4,coAx_1,coAx_2,coAx_3,coAx_4]
+
+{------------------------------------------------------------------------------}
+-- Focusing block
+{------------------------------------------------------------------------------}
+-- Defocus R-1 - Simple defocusing action
+-- x+ |- [x+] => x+ |- x+
+defocusR_1 :: Test
+defocusR_1 = (defocusR
+  (Sequent
+    (IStruct
+      (P (Positive "x")))
+    (FOStruct
+      (Positive "x")))
+  ==
+  Sequent
+    (IStruct
+      (P (Positive "x")))
+    (OStruct
+      (P (Positive "x"))),
+  True,
+  "Defocus R-1")
+{------------------------------------------------------------------------------}
+-- Focus test list
+focusTests :: [Test]
+focusTests = []

@@ -32,6 +32,7 @@ data IStructure = IStruct Formula
   | STensor IStructure IStructure
   | SRDiff IStructure OStructure
   | SLDiff OStructure IStructure
+  deriving (Eq)
 
 -- Output structure datatype
 data OStructure = OStruct Formula
@@ -39,9 +40,11 @@ data OStructure = OStruct Formula
   | SSum OStructure OStructure
   | SRDiv OStructure IStructure
   | SLDiv IStructure OStructure
+  deriving (Eq)
 
 -- Sequent datatype
 data Sequent = Sequent IStructure OStructure
+  deriving (Eq)
 
 {------------------------------------------------------------------------------}
 -- Datatypes for Lexicons
