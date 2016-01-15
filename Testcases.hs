@@ -180,4 +180,4 @@ defocusR_1 = (defocusR
 {------------------------------------------------------------------------------}
 -- Focus test list
 focusTests :: [Test]
-focusTests = []
+focusTests = [defocusR_1]
