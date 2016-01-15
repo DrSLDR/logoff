@@ -179,6 +179,63 @@ defocusR_1 = ((==)
   "Defocus R-1"
   )
 {------------------------------------------------------------------------------}
+-- Defocus L-1 - Simple defocusing action
+-- [x-] |- x- => x- |- x-
+defocusL_1 :: Test
+defocusL_1 = ((==)
+  (defocusL
+    (Sequent
+      (FIStruct
+        (Negative "x"))
+      (OStruct
+        (N (Negative "x")))))
+    (Sequent
+      (IStruct
+        (N (Negative "x")))
+      (OStruct
+        (N (Negative"x")))),
+  True,
+  "Defocus L-1"
+  )
+{------------------------------------------------------------------------------}
+-- Focus R-1 - Simple focusing action
+-- x+ |- x+ => x+ |- [x+]
+focusR_1 :: Test
+focusR_1 = ((==)
+  (focusR
+    (Sequent
+      (IStruct
+        (P (Positive "x")))
+      (OStruct
+        (P (Positive "x")))))
+  (Sequent
+    (IStruct
+      (P (Positive "x")))
+    (FOStruct
+      (Positive "x"))),
+  True,
+  "Focus R-1"
+  )
+{------------------------------------------------------------------------------}
+-- Focus L-1 - Simple focusing action
+-- x- |- x- => [x-] |- x-
+focusL_1 :: Test
+focusL_1 = ((==)
+  (focusL
+    (Sequent
+      (IStruct
+        (N (Negative "x")))
+      (OStruct
+        (N (Negative"x")))))
+  (Sequent
+    (FIStruct
+      (Negative "x"))
+    (OStruct
+      (N (Negative "x")))),
+  True,
+  "Focus L-1"
+  )
+{------------------------------------------------------------------------------}
 -- Focus test list
 focusTests :: [Test]
-focusTests = [defocusR_1]
+focusTests = [defocusR_1, defocusL_1,focusR_1,focusL_1]
