@@ -11,9 +11,9 @@ Proof searcher for Focused Lambek-Grishin (LGf) calculus
 
 ## Planned features:
 
-- Bottom-up proof-tree construction
+- Top-down proof-tree construction
 - Proof-tree verification
-- Top-down proof derivation
+- Bottom-up proof derivation
 - MILL homomorphism
 
 ## ToDo:
@@ -27,7 +27,7 @@ Proof searcher for Focused Lambek-Grishin (LGf) calculus
   - [x] Verbose testing output
   - [x] "Easily" extensible framework
 - [x] Travis integration
-- [ ] Bottom-up proofing algorithm
+- [ ] Top-down proofing algorithm
 - There will be more...
 
 ---
