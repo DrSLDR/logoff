@@ -199,39 +199,39 @@ defocusL_1 = ((==)
   )
 {------------------------------------------------------------------------------}
 -- Focus R-1 - Simple focusing action
--- x+ |- x+ => x+ |- [x+]
+-- x- |- x- => x- |- [x-]
 focusR_1 :: Test
 focusR_1 = ((==)
   (focusR
     (Sequent
       (IStruct
-        (P (Positive "x")))
+        (N (Negative "x")))
       (OStruct
-        (P (Positive "x")))))
+        (N (Negative "x")))))
   (Sequent
     (IStruct
-      (P (Positive "x")))
+      (N (Negative "x")))
     (OStruct
-      (FP (Positive "x")))),
+      (FN (Negative "x")))),
   True,
   "Focus R-1"
   )
 {------------------------------------------------------------------------------}
 -- Focus L-1 - Simple focusing action
--- x- |- x- => [x-] |- x-
+-- x+ |- x+ => [x+] |- x+
 focusL_1 :: Test
 focusL_1 = ((==)
   (focusL
     (Sequent
       (IStruct
-        (N (Negative "x")))
+        (P (Positive "x")))
       (OStruct
-        (N (Negative"x")))))
+        (P (Positive"x")))))
   (Sequent
     (IStruct
-      (FN (Negative "x")))
+      (FP (Positive "x")))
     (OStruct
-      (N (Negative "x")))),
+      (P (Positive "x")))),
   True,
   "Focus L-1"
   )
