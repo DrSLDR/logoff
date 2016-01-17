@@ -52,8 +52,8 @@ ax_1 = (isAx
   (Sequent
     (IStruct
       (P (Positive "x")))
-    (FOStruct
-      (Positive "x"))),
+    (OStruct
+      (FP (Positive "x")))),
   True,
   "Trivial Ax-1"
   )
@@ -65,8 +65,8 @@ ax_2 = (isAx
   (Sequent
     (IStruct
       (P (Positive "x")))
-    (FOStruct
-      (Positive "y"))),
+    (OStruct
+      (FP (Positive "y")))),
   False,
   "Trivial Ax-2"
   )
@@ -91,10 +91,10 @@ ax_4 = (isAx
   (Sequent
     (IStruct
       (P (Positive "x")))
-    (FOStruct
-      (Tensor
+    (OStruct
+      (FP (Tensor
         (P (Positive "x"))
-        (P (Positive "x"))))),
+        (P (Positive "x")))))),
   False,
   "Trivial Ax-4"
   )
@@ -104,8 +104,8 @@ ax_4 = (isAx
 coAx_1 :: Test
 coAx_1 = (isCoAx
   (Sequent
-    (FIStruct
-      (Negative "x"))
+    (IStruct
+      (FN (Negative "x")))
     (OStruct
       (N (Negative "x")))),
   True,
@@ -117,8 +117,8 @@ coAx_1 = (isCoAx
 coAx_2 :: Test
 coAx_2 = (isCoAx
   (Sequent
-    (FIStruct
-      (Negative "x"))
+    (IStruct
+      (FN (Negative "x")))
     (OStruct
       (N (Negative "y")))),
   False,
@@ -143,10 +143,10 @@ coAx_3 = (isCoAx
 coAx_4 :: Test
 coAx_4 = (isCoAx
   (Sequent
-    (FIStruct
-      (Sum
+    (IStruct
+      (FN (Sum
         (N (Negative "x"))
-        (N (Negative "x"))))
+        (N (Negative "x")))))
     (OStruct
       (N (Negative "x")))),
   False,
@@ -168,8 +168,8 @@ defocusR_1 = ((==)
     (Sequent
       (IStruct
         (P (Positive "x")))
-      (FOStruct
-        (Positive "x"))))
+      (OStruct
+        (FP (Positive "x")))))
     (Sequent
       (IStruct
         (P (Positive "x")))
@@ -185,8 +185,8 @@ defocusL_1 :: Test
 defocusL_1 = ((==)
   (defocusL
     (Sequent
-      (FIStruct
-        (Negative "x"))
+      (IStruct
+        (FN (Negative "x")))
       (OStruct
         (N (Negative "x")))))
     (Sequent
@@ -211,8 +211,8 @@ focusR_1 = ((==)
   (Sequent
     (IStruct
       (P (Positive "x")))
-    (FOStruct
-      (Positive "x"))),
+    (OStruct
+      (FP (Positive "x")))),
   True,
   "Focus R-1"
   )
@@ -228,8 +228,8 @@ focusL_1 = ((==)
       (OStruct
         (N (Negative"x")))))
   (Sequent
-    (FIStruct
-      (Negative "x"))
+    (IStruct
+      (FN (Negative "x")))
     (OStruct
       (N (Negative "x")))),
   True,
