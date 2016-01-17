@@ -331,7 +331,7 @@ monoRDiv_1 = ((==)
       (OStruct (N (Negative "y")))
       (IStruct (P (Positive "x"))))),
   True,
-  "monoLDiv-1")
+  "monoRDiv-1")
 {------------------------------------------------------------------------------}
 -- monoLDiff-1 - Simple, axiomatic test
 -- x+ |- [x+]; [y-] |- y- => y- SLDiff x+ |- [(y- (\) x+)+]
@@ -353,7 +353,7 @@ monoLDiff_1 = ((==)
         (N (Negative "y"))
         (P (Positive "x")))))),
   True,
-  "monoLDiv-1")
+  "monoLDiff-1")
 {------------------------------------------------------------------------------}
 -- monoRDiff-1 - Simple, axiomatic test
 -- x+ |- [x+]; [y-] |- y- => x+ SRDiff y- |- [(x+ (/) y-)+]
@@ -375,7 +375,7 @@ monoRDiff_1 = ((==)
         (P (Positive "x"))
         (N (Negative "y")))))),
   True,
-  "monoLDiv-1")
+  "monoRDiff-1")
 {------------------------------------------------------------------------------}
 -- Monotonicity test list
 monoTests :: [Test]
