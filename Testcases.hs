@@ -40,7 +40,7 @@ evaluateResult = all fst
 
 -- Master test list
 tests :: [Test]
-tests = axTests ++ focusTests
+tests = axTests ++ focusTests ++ monoTests
 
 {------------------------------------------------------------------------------}
 -- Axiom block
@@ -239,3 +239,145 @@ focusL_1 = ((==)
 -- Focus test list
 focusTests :: [Test]
 focusTests = [defocusR_1, defocusL_1,focusR_1,focusL_1]
+
+{------------------------------------------------------------------------------}
+-- Monotonicity block
+{------------------------------------------------------------------------------}
+-- monoTensor-1 - Simple, axiomatic test
+-- x+ |- [x+]; y+ |- [y+] => x+ STensor y+ |- [(x+ tensor y+)+]
+monoTensor_1 :: Test
+monoTensor_1 = ((==)
+  (monoTensor
+    (Sequent
+      (IStruct (P (Positive "x")))
+      (OStruct (FP (Positive "x"))))
+    (Sequent
+      (IStruct (P (Positive "y")))
+      (OStruct (FP (Positive "y")))))
+  (Sequent
+    (STensor
+      (IStruct (P (Positive "x")))
+      (IStruct (P (Positive "y"))))
+    (OStruct
+      (FP (Tensor
+        (P (Positive "x"))
+        (P (Positive "y")))))),
+  True,
+  "monoTensor-1"
+  )
+{------------------------------------------------------------------------------}
+-- monoSum-1 - Simple, axiomatic test
+-- [x-] |- x-; [y-] |- y- => [(x- + y-)-] |- x- SSum y-
+monoSum_1 :: Test
+monoSum_1 = ((==)
+  (monoSum
+    (Sequent
+      (IStruct (FN (Negative "x")))
+      (OStruct (N (Negative "x"))))
+    (Sequent
+      (IStruct (FN (Negative "y")))
+      (OStruct (N (Negative "y")))))
+  (Sequent
+    (IStruct
+      (FN (Sum
+        (N (Negative "x"))
+        (N (Negative "y")))))
+    (SSum
+      (OStruct (N (Negative "x")))
+      (OStruct (N (Negative "y"))))),
+  True,
+  "monoSum-1"
+  )
+{------------------------------------------------------------------------------}
+-- monoLDiv-1 - Simple, axiomatic test
+-- x+ |- [x+]; [y-] |- y- => [(x+ \ y-)-] |- x+ SLDiv y-
+monoLDiv_1 :: Test
+monoLDiv_1 = ((==)
+  (monoLDiv
+    (Sequent
+      (IStruct (P (Positive "x")))
+      (OStruct (FP (Positive "x"))))
+    (Sequent
+      (IStruct (FN (Negative "y")))
+      (OStruct (N (Negative "y")))))
+    (Sequent
+      (IStruct
+        (FN (LDiv
+          (P (Positive "x"))
+          (N (Negative "y")))))
+      (SLDiv
+        (IStruct (P (Positive "x")))
+        (OStruct (N (Negative "y"))))),
+  True,
+  "monoLDiv-1")
+{------------------------------------------------------------------------------}
+-- monoRDiv-1 - Simple, axiomatic test
+-- x+ |- [x+]; [y-] |- y- => [(y- / x+)-] |- y- SRDiv x+
+monoRDiv_1 :: Test
+monoRDiv_1 = ((==)
+  (monoRDiv
+    (Sequent
+      (IStruct (P (Positive "x")))
+      (OStruct (FP (Positive "x"))))
+    (Sequent
+      (IStruct (FN (Negative "y")))
+      (OStruct (N (Negative "y")))))
+  (Sequent
+    (IStruct
+      (FN (RDiv
+        (N (Negative "y"))
+        (P (Positive "x")))))
+    (SRDiv
+      (OStruct (N (Negative "y")))
+      (IStruct (P (Positive "x"))))),
+  True,
+  "monoLDiv-1")
+{------------------------------------------------------------------------------}
+-- monoLDiff-1 - Simple, axiomatic test
+-- x+ |- [x+]; [y-] |- y- => y- SLDiff x+ |- [(y- (\) x+)+]
+monoLDiff_1 :: Test
+monoLDiff_1 = ((==)
+  (monoLDiff
+    (Sequent
+      (IStruct (P (Positive "x")))
+      (OStruct (FP (Positive "x"))))
+    (Sequent
+      (IStruct (FN (Negative "y")))
+      (OStruct (N (Negative "y")))))
+  (Sequent
+    (SLDiff
+      (OStruct (N (Negative "y")))
+      (IStruct (P (Positive "x"))))
+    (OStruct
+      (FP (LDiff
+        (N (Negative "y"))
+        (P (Positive "x")))))),
+  True,
+  "monoLDiv-1")
+{------------------------------------------------------------------------------}
+-- monoRDiff-1 - Simple, axiomatic test
+-- x+ |- [x+]; [y-] |- y- => x+ SRDiff y- |- [(x+ (/) y-)+]
+monoRDiff_1 :: Test
+monoRDiff_1 = ((==)
+  (monoRDiff
+    (Sequent
+      (IStruct (P (Positive "x")))
+      (OStruct (FP (Positive "x"))))
+    (Sequent
+      (IStruct (FN (Negative "y")))
+      (OStruct (N (Negative "y")))))
+  (Sequent
+    (SRDiff
+      (IStruct (P (Positive "x")))
+      (OStruct (N (Negative "y"))))
+    (OStruct
+      (FP (RDiff
+        (P (Positive "x"))
+        (N (Negative "y")))))),
+  True,
+  "monoLDiv-1")
+{------------------------------------------------------------------------------}
+-- Monotonicity test list
+monoTests :: [Test]
+monoTests = [monoTensor_1, monoSum_1, monoLDiv_1, monoRDiv_1, monoLDiff_1,
+  monoRDiff_1]

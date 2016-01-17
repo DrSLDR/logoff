@@ -48,3 +48,32 @@ focusL :: Sequent -> Sequent
 focusL (Sequent (IStruct (P i)) o) =
   Sequent (IStruct (FP i)) o
 focusL s = s
+
+{------------------------------------------------------------------------------}
+-- Monotonicity block
+-- Note that if the functions can't treat the given sequent, they return the
+-- left one
+{------------------------------------------------------------------------------}
+-- Tensor - introduces tensor
+monoTensor :: Sequent -> Sequent -> Sequent
+monoTensor l r = l
+
+-- Sum - introduces sum
+monoSum :: Sequent -> Sequent -> Sequent
+monoSum l r = l
+
+-- Left division - introduces LDiv
+monoLDiv :: Sequent -> Sequent -> Sequent
+monoLDiv l r = l
+
+-- Right division - introduces RDiv
+monoRDiv :: Sequent -> Sequent -> Sequent
+monoRDiv l r = l
+
+-- Left difference - introduces LDiff
+monoLDiff :: Sequent -> Sequent -> Sequent
+monoLDiff l r = l
+
+-- Right difference - introduces RDiff
+monoRDiff :: Sequent -> Sequent -> Sequent
+monoRDiff l r = l
