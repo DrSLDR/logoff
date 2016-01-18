@@ -56,24 +56,36 @@ focusL s = s
 {------------------------------------------------------------------------------}
 -- Tensor - introduces tensor
 monoTensor :: Sequent -> Sequent -> Sequent
+monoTensor (Sequent xi (FOStruct xo)) (Sequent yi (FOStruct yo)) =
+  Sequent (STensor xi yi) (FOStruct (P (Tensor xo yo)))
 monoTensor l r = l
 
 -- Sum - introduces sum
 monoSum :: Sequent -> Sequent -> Sequent
+monoSum (Sequent (FIStruct xi) xo) (Sequent (FIStruct yi) yo) =
+  Sequent (FIStruct (N (Sum xi yi))) (SSum xo yo)
 monoSum l r = l
 
 -- Left division - introduces LDiv
 monoLDiv :: Sequent -> Sequent -> Sequent
+monoLDiv (Sequent xi (FOStruct xo)) (Sequent (FIStruct yi) yo) =
+  Sequent (FIStruct (N (LDiv xo yi))) (SLDiv xi yo)
 monoLDiv l r = l
 
 -- Right division - introduces RDiv
 monoRDiv :: Sequent -> Sequent -> Sequent
+monoRDiv (Sequent xi (FOStruct xo)) (Sequent (FIStruct yi) yo) =
+  Sequent (FIStruct (N (RDiv yi xo))) (SRDiv yo xi)
 monoRDiv l r = l
 
 -- Left difference - introduces LDiff
 monoLDiff :: Sequent -> Sequent -> Sequent
+monoLDiff (Sequent xi (FOStruct xo)) (Sequent (FIStruct yi) yo) =
+  Sequent (SLDiff yo xi) (FOStruct (P (LDiff yi xo)))
 monoLDiff l r = l
 
 -- Right difference - introduces RDiff
 monoRDiff :: Sequent -> Sequent -> Sequent
+monoRDiff (Sequent xi (FOStruct xo)) (Sequent (FIStruct yi) yo) =
+  Sequent (SRDiff xi yo) (FOStruct (P (RDiff xo yi)))
 monoRDiff l r = l
