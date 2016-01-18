@@ -27,6 +27,9 @@ Proof searcher for Focused Lambek-Grishin (LGf) calculus
   - [x] Verbose testing output
   - [x] "Easily" extensible framework
 - [x] Travis integration
+- [ ] Input/Output
+  - [x] Nicely formated output
+  - [ ] Input parsing
 - [ ] Top-down proofing algorithm
 - There will be more...
 
