@@ -40,7 +40,47 @@ evaluateResult = all fst
 
 -- Master test list
 tests :: [Test]
-tests = axTests ++ focusTests ++ monoTests
+tests = srTests ++ axTests ++ focusTests ++ monoTests
+
+{------------------------------------------------------------------------------}
+-- Show/Read block
+{------------------------------------------------------------------------------}
+-- NiceShow-1 - Neutral sequent output
+niceShow_1 :: Test
+niceShow_1 =((==)
+  (niceShow
+    (Sequent
+      (IStruct (P (Positive "x")))
+      (OStruct (P (Positive "x")))))
+  "x+ |- x+",
+  True,
+  "NiceShow-1")
+{------------------------------------------------------------------------------}
+-- NiceShow-2 - Left-focused sequent output
+niceShow_2 :: Test
+niceShow_2 =((==)
+  (niceShow
+    (Sequent
+      (FIStruct (P (Positive "x")))
+      (OStruct (P (Positive "x")))))
+  "[x+] |- x+",
+  True,
+  "NiceShow-2")
+{------------------------------------------------------------------------------}
+-- NiceShow-3 - Right-focused sequent output
+niceShow_3 :: Test
+niceShow_3 =((==)
+  (niceShow
+    (Sequent
+      (IStruct (P (Positive "x")))
+      (FOStruct (P (Positive "x")))))
+  "x+ |- [x+]",
+  True,
+  "NiceShow-3")
+{------------------------------------------------------------------------------}
+-- Show/Read test list
+srTests :: [Test]
+srTests = []
 
 {------------------------------------------------------------------------------}
 -- Axiom block
