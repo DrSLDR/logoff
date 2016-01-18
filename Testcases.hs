@@ -78,9 +78,106 @@ niceShow_3 =((==)
   True,
   "NiceShow-3")
 {------------------------------------------------------------------------------}
+-- NiceShow-4 - Tensors
+niceShow_4 :: Test
+niceShow_4 =((==)
+  (niceShow
+    (Sequent
+      (STensor
+        (IStruct (P (Positive "x")))
+        (IStruct (P (Positive "y"))))
+      (FOStruct
+        (P (Tensor
+          (P (Positive "x"))
+          (P (Positive "y")))))))
+  "(x+ .(x). y+) |- [(x+ (x) y+)]",
+  True,
+  "NiceShow-4")
+{------------------------------------------------------------------------------}
+-- NiceShow-5 - Sums
+niceShow_5 :: Test
+niceShow_5 =((==)
+  (niceShow
+    (Sequent
+      (FIStruct
+        (N (Sum
+          (N (Negative "x"))
+          (N (Negative "y")))))
+      (SSum
+        (OStruct (N (Negative "x")))
+        (OStruct (N (Negative "y"))))))
+  "[(x- (+) y-)] |- (x- .(+). y-)",
+  True,
+  "NiceShow-5")
+{------------------------------------------------------------------------------}
+-- NiceShow-6 - Left division
+niceShow_6 :: Test
+niceShow_6 =((==)
+  (niceShow
+    (Sequent
+      (FIStruct
+        (N (LDiv
+          (P (Positive "x"))
+          (N (Negative "y")))))
+      (SLDiv
+        (IStruct (P (Positive "x")))
+        (OStruct (N (Negative "y"))))))
+  "[(x+ \\ y-)] |- (x+ .\\. y-)",
+  True,
+  "NiceShow-6")
+{------------------------------------------------------------------------------}
+-- NiceShow-7 - Right division
+niceShow_7 :: Test
+niceShow_7 =((==)
+  (niceShow
+    (Sequent
+      (FIStruct
+        (N (RDiv
+          (N (Negative "y"))
+          (P (Positive "x")))))
+      (SRDiv
+        (OStruct (N (Negative "y")))
+        (IStruct (P (Positive "x"))))))
+  "[(y- / x+)] |- (y- ./. x+)",
+  True,
+  "NiceShow-7")
+{------------------------------------------------------------------------------}
+-- NiceShow-8 - Left difference
+niceShow_8 :: Test
+niceShow_8 =((==)
+  (niceShow
+    (Sequent
+      (SLDiff
+        (OStruct (N (Negative "y")))
+        (IStruct (P (Positive "x"))))
+      (FOStruct
+        (P (LDiff
+          (N (Negative "y"))
+          (P (Positive "x")))))))
+  "(y- .(\\). x+) |- [(y- (\\) x+)]",
+  True,
+  "NiceShow-8")
+{------------------------------------------------------------------------------}
+-- NiceShow-9 - Right difference
+niceShow_9 :: Test
+niceShow_9 =((==)
+  (niceShow
+    (Sequent
+      (SRDiff
+        (IStruct (P (Positive "x")))
+        (OStruct (N (Negative "y"))))
+      (FOStruct
+        (P (RDiff
+          (P (Positive "x"))
+          (N (Negative "y")))))))
+  "(x+ .(/). y-) |- [(x+ (/) y-)]",
+  True,
+  "NiceShow-9")
+{------------------------------------------------------------------------------}
 -- Show/Read test list
 srTests :: [Test]
-srTests = [niceShow_1, niceShow_2, niceShow_3]
+srTests = [niceShow_1, niceShow_2, niceShow_3, niceShow_4, niceShow_5,
+  niceShow_6, niceShow_7, niceShow_8, niceShow_9]
 
 {------------------------------------------------------------------------------}
 -- Axiom block
@@ -284,7 +381,7 @@ focusTests = [defocusR_1, defocusL_1,focusR_1,focusL_1]
 -- Monotonicity block
 {------------------------------------------------------------------------------}
 -- monoTensor-1 - Simple, axiomatic test
--- x+ |- [x+]; y+ |- [y+] => x+ STensor y+ |- [(x+ tensor y+)+]
+-- x+ |- [x+]; y+ |- [y+] => (x+ .(x). y+) |- [(x+ (x) y+)]
 monoTensor_1 :: Test
 monoTensor_1 = ((==)
   (monoTensor
@@ -307,7 +404,7 @@ monoTensor_1 = ((==)
   )
 {------------------------------------------------------------------------------}
 -- monoSum-1 - Simple, axiomatic test
--- [x-] |- x-; [y-] |- y- => [(x- + y-)-] |- x- SSum y-
+-- [x-] |- x-; [y-] |- y- => [(x- (+) y-)] |- (x- .(+). y-)
 monoSum_1 :: Test
 monoSum_1 = ((==)
   (monoSum
@@ -330,7 +427,7 @@ monoSum_1 = ((==)
   )
 {------------------------------------------------------------------------------}
 -- monoLDiv-1 - Simple, axiomatic test
--- x+ |- [x+]; [y-] |- y- => [(x+ \ y-)-] |- x+ SLDiv y-
+-- x+ |- [x+]; [y-] |- y- => [(x+ \ y-)] |- (x+ .\. y-)
 monoLDiv_1 :: Test
 monoLDiv_1 = ((==)
   (monoLDiv
@@ -352,7 +449,7 @@ monoLDiv_1 = ((==)
   "monoLDiv-1")
 {------------------------------------------------------------------------------}
 -- monoRDiv-1 - Simple, axiomatic test
--- x+ |- [x+]; [y-] |- y- => [(y- / x+)-] |- y- SRDiv x+
+-- x+ |- [x+]; [y-] |- y- => [(y- / x+)] |- (y- ./. x+)
 monoRDiv_1 :: Test
 monoRDiv_1 = ((==)
   (monoRDiv
@@ -374,7 +471,7 @@ monoRDiv_1 = ((==)
   "monoRDiv-1")
 {------------------------------------------------------------------------------}
 -- monoLDiff-1 - Simple, axiomatic test
--- x+ |- [x+]; [y-] |- y- => y- SLDiff x+ |- [(y- (\) x+)+]
+-- x+ |- [x+]; [y-] |- y- => (y- .(\). x+) |- [(y- (\) x+)]
 monoLDiff_1 :: Test
 monoLDiff_1 = ((==)
   (monoLDiff
@@ -396,7 +493,7 @@ monoLDiff_1 = ((==)
   "monoLDiff-1")
 {------------------------------------------------------------------------------}
 -- monoRDiff-1 - Simple, axiomatic test
--- x+ |- [x+]; [y-] |- y- => x+ SRDiff y- |- [(x+ (/) y-)+]
+-- x+ |- [x+]; [y-] |- y- => (x+ .(/). y-) |- [(x+ (/) y-)]
 monoRDiff_1 :: Test
 monoRDiff_1 = ((==)
   (monoRDiff

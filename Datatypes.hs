@@ -20,8 +20,8 @@ data Formula = P PFormula
   deriving (Eq, Show)
 
 instance NiceShow Formula where
-  niceShow (P f) = niceShow f ++ "+"
-  niceShow (N f) = niceShow f ++ "-"
+  niceShow (P f) = niceShow f
+  niceShow (N f) = niceShow f
 
 -- Positive formula datatype
 data PFormula = Positive Atom
@@ -31,7 +31,7 @@ data PFormula = Positive Atom
   deriving (Eq, Show)
 
 instance NiceShow PFormula where
-  niceShow (Positive p) = p
+  niceShow (Positive p) = p ++ "+"
   niceShow (Tensor f1 f2) = "(" ++ niceShow f1 ++ " (x) " ++ niceShow f2 ++ ")"
   niceShow (RDiff f1 f2) = "(" ++ niceShow f1 ++ " (/) " ++ niceShow f2 ++ ")"
   niceShow (LDiff f1 f2) = "(" ++ niceShow f1 ++ " (\\) " ++ niceShow f2 ++ ")"
@@ -43,7 +43,7 @@ data NFormula = Negative Atom
   deriving (Eq, Show)
 
 instance NiceShow NFormula where
-  niceShow (Negative p) = p
+  niceShow (Negative p) = p ++ "-"
   niceShow (Sum f1 f2) = "(" ++ niceShow f1 ++ " (+) " ++ niceShow f2 ++ ")"
   niceShow (RDiv f1 f2) = "(" ++ niceShow f1 ++ " / " ++ niceShow f2 ++ ")"
   niceShow (LDiv f1 f2) = "(" ++ niceShow f1 ++ " \\ " ++ niceShow f2 ++ ")"
