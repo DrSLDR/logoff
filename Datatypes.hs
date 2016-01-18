@@ -10,9 +10,7 @@ type Atom = String
 
 -- Generic formula datatype
 data Formula = P PFormula
-  | FP PFormula
   | N NFormula
-  | FN NFormula
   deriving (Eq)
 
 -- Positive formula datatype
@@ -30,6 +28,7 @@ data NFormula = Negative Atom
 
 -- Input structure datatype
 data IStructure = IStruct Formula
+  | FIStruct Formula
   | STensor IStructure IStructure
   | SRDiff IStructure OStructure
   | SLDiff OStructure IStructure
@@ -37,6 +36,7 @@ data IStructure = IStruct Formula
 
 -- Output structure datatype
 data OStructure = OStruct Formula
+  | FOStruct Formula
   | SSum OStructure OStructure
   | SRDiv OStructure IStructure
   | SLDiv IStructure OStructure

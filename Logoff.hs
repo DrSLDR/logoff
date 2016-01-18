@@ -11,13 +11,13 @@ import Datatypes
 {------------------------------------------------------------------------------}
 -- isAx verifies if a sequent is an Ax-type axiom
 isAx :: Sequent -> Bool
-isAx (Sequent (IStruct (P inf)) (OStruct  (FP ouf))) =
+isAx (Sequent (IStruct (P inf)) (FOStruct  (P ouf))) =
   ouf == inf
 isAx _ = False
 
 -- isCoAx verifies if a sequent is a CoAx-type axiom
 isCoAx :: Sequent -> Bool
-isCoAx (Sequent (IStruct  (FN inf)) (OStruct (N ouf))) =
+isCoAx (Sequent (FIStruct  (N inf)) (OStruct (N ouf))) =
   ouf == inf
 isCoAx _ = False
 
@@ -27,26 +27,26 @@ isCoAx _ = False
 {------------------------------------------------------------------------------}
 -- Defocus right (or top-down focus right)
 defocusR :: Sequent -> Sequent
-defocusR (Sequent i (OStruct (FP o))) =
+defocusR (Sequent i (FOStruct (P o))) =
   Sequent i (OStruct (P o))
 defocusR s = s
 
 -- Defocus left (or top-down focus left)
 defocusL :: Sequent -> Sequent
-defocusL (Sequent (IStruct (FN i)) o) =
+defocusL (Sequent (FIStruct (N i)) o) =
   Sequent (IStruct (N i)) o
 defocusL s = s
 
 -- Focus right (or top-down defocus right)
 focusR :: Sequent -> Sequent
 focusR (Sequent i (OStruct (N o))) =
-  Sequent i (OStruct (FN o))
+  Sequent i (FOStruct (N o))
 focusR s = s
 
 -- Focus left (or top-down defocus left)
 focusL :: Sequent -> Sequent
 focusL (Sequent (IStruct (P i)) o) =
-  Sequent (IStruct (FP i)) o
+  Sequent (FIStruct (P i)) o
 focusL s = s
 
 {------------------------------------------------------------------------------}

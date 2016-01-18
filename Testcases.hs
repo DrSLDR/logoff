@@ -52,8 +52,8 @@ ax_1 = (isAx
   (Sequent
     (IStruct
       (P (Positive "x")))
-    (OStruct
-      (FP (Positive "x")))),
+    (FOStruct
+      (P (Positive "x")))),
   True,
   "Trivial Ax-1"
   )
@@ -65,8 +65,8 @@ ax_2 = (isAx
   (Sequent
     (IStruct
       (P (Positive "x")))
-    (OStruct
-      (FP (Positive "y")))),
+    (FOStruct
+      (P (Positive "y")))),
   False,
   "Trivial Ax-2"
   )
@@ -91,8 +91,8 @@ ax_4 = (isAx
   (Sequent
     (IStruct
       (P (Positive "x")))
-    (OStruct
-      (FP (Tensor
+    (FOStruct
+      (P (Tensor
         (P (Positive "x"))
         (P (Positive "x")))))),
   False,
@@ -104,8 +104,8 @@ ax_4 = (isAx
 coAx_1 :: Test
 coAx_1 = (isCoAx
   (Sequent
-    (IStruct
-      (FN (Negative "x")))
+    (FIStruct
+      (N (Negative "x")))
     (OStruct
       (N (Negative "x")))),
   True,
@@ -117,8 +117,8 @@ coAx_1 = (isCoAx
 coAx_2 :: Test
 coAx_2 = (isCoAx
   (Sequent
-    (IStruct
-      (FN (Negative "x")))
+    (FIStruct
+      (N (Negative "x")))
     (OStruct
       (N (Negative "y")))),
   False,
@@ -143,8 +143,8 @@ coAx_3 = (isCoAx
 coAx_4 :: Test
 coAx_4 = (isCoAx
   (Sequent
-    (IStruct
-      (FN (Sum
+    (FIStruct
+      (N (Sum
         (N (Negative "x"))
         (N (Negative "x")))))
     (OStruct
@@ -168,8 +168,8 @@ defocusR_1 = ((==)
     (Sequent
       (IStruct
         (P (Positive "x")))
-      (OStruct
-        (FP (Positive "x")))))
+      (FOStruct
+        (P (Positive "x")))))
     (Sequent
       (IStruct
         (P (Positive "x")))
@@ -185,8 +185,8 @@ defocusL_1 :: Test
 defocusL_1 = ((==)
   (defocusL
     (Sequent
-      (IStruct
-        (FN (Negative "x")))
+      (FIStruct
+        (N (Negative "x")))
       (OStruct
         (N (Negative "x")))))
     (Sequent
@@ -211,8 +211,8 @@ focusR_1 = ((==)
   (Sequent
     (IStruct
       (N (Negative "x")))
-    (OStruct
-      (FN (Negative "x")))),
+    (FOStruct
+      (N (Negative "x")))),
   True,
   "Focus R-1"
   )
@@ -228,8 +228,8 @@ focusL_1 = ((==)
       (OStruct
         (P (Positive"x")))))
   (Sequent
-    (IStruct
-      (FP (Positive "x")))
+    (FIStruct
+      (P (Positive "x")))
     (OStruct
       (P (Positive "x")))),
   True,
@@ -250,16 +250,16 @@ monoTensor_1 = ((==)
   (monoTensor
     (Sequent
       (IStruct (P (Positive "x")))
-      (OStruct (FP (Positive "x"))))
+      (FOStruct (P (Positive "x"))))
     (Sequent
       (IStruct (P (Positive "y")))
-      (OStruct (FP (Positive "y")))))
+      (FOStruct (P (Positive "y")))))
   (Sequent
     (STensor
       (IStruct (P (Positive "x")))
       (IStruct (P (Positive "y"))))
-    (OStruct
-      (FP (Tensor
+    (FOStruct
+      (P (Tensor
         (P (Positive "x"))
         (P (Positive "y")))))),
   True,
@@ -272,14 +272,14 @@ monoSum_1 :: Test
 monoSum_1 = ((==)
   (monoSum
     (Sequent
-      (IStruct (FN (Negative "x")))
+      (FIStruct (N (Negative "x")))
       (OStruct (N (Negative "x"))))
     (Sequent
-      (IStruct (FN (Negative "y")))
+      (FIStruct (N (Negative "y")))
       (OStruct (N (Negative "y")))))
   (Sequent
-    (IStruct
-      (FN (Sum
+    (FIStruct
+      (N (Sum
         (N (Negative "x"))
         (N (Negative "y")))))
     (SSum
@@ -296,13 +296,13 @@ monoLDiv_1 = ((==)
   (monoLDiv
     (Sequent
       (IStruct (P (Positive "x")))
-      (OStruct (FP (Positive "x"))))
+      (FOStruct (P (Positive "x"))))
     (Sequent
-      (IStruct (FN (Negative "y")))
+      (FIStruct (N (Negative "y")))
       (OStruct (N (Negative "y")))))
     (Sequent
-      (IStruct
-        (FN (LDiv
+      (FIStruct
+        (N (LDiv
           (P (Positive "x"))
           (N (Negative "y")))))
       (SLDiv
@@ -318,13 +318,13 @@ monoRDiv_1 = ((==)
   (monoRDiv
     (Sequent
       (IStruct (P (Positive "x")))
-      (OStruct (FP (Positive "x"))))
+      (FOStruct (P (Positive "x"))))
     (Sequent
-      (IStruct (FN (Negative "y")))
+      (FIStruct (N (Negative "y")))
       (OStruct (N (Negative "y")))))
   (Sequent
-    (IStruct
-      (FN (RDiv
+    (FIStruct
+      (N (RDiv
         (N (Negative "y"))
         (P (Positive "x")))))
     (SRDiv
@@ -340,16 +340,16 @@ monoLDiff_1 = ((==)
   (monoLDiff
     (Sequent
       (IStruct (P (Positive "x")))
-      (OStruct (FP (Positive "x"))))
+      (FOStruct (P (Positive "x"))))
     (Sequent
-      (IStruct (FN (Negative "y")))
+      (FIStruct (N (Negative "y")))
       (OStruct (N (Negative "y")))))
   (Sequent
     (SLDiff
       (OStruct (N (Negative "y")))
       (IStruct (P (Positive "x"))))
-    (OStruct
-      (FP (LDiff
+    (FOStruct
+      (P (LDiff
         (N (Negative "y"))
         (P (Positive "x")))))),
   True,
@@ -362,16 +362,16 @@ monoRDiff_1 = ((==)
   (monoRDiff
     (Sequent
       (IStruct (P (Positive "x")))
-      (OStruct (FP (Positive "x"))))
+      (FOStruct (P (Positive "x"))))
     (Sequent
-      (IStruct (FN (Negative "y")))
+      (FIStruct (N (Negative "y")))
       (OStruct (N (Negative "y")))))
   (Sequent
     (SRDiff
       (IStruct (P (Positive "x")))
       (OStruct (N (Negative "y"))))
-    (OStruct
-      (FP (RDiff
+    (FOStruct
+      (P (RDiff
         (P (Positive "x"))
         (N (Negative "y")))))),
   True,
