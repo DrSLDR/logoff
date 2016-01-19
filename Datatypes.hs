@@ -9,6 +9,12 @@ class NiceShow a where
   niceShow :: a -> String
 
 {------------------------------------------------------------------------------}
+-- Nice-input read function and parser
+{------------------------------------------------------------------------------}
+niceRead :: String -> Sequent
+niceRead _ = Sequent (IStruct (P (Positive "x"))) (OStruct (P (Positive "x")))
+
+{------------------------------------------------------------------------------}
 -- Datatypes for LGf sequents
 {------------------------------------------------------------------------------}
 -- Atomic type

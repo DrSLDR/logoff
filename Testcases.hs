@@ -174,10 +174,132 @@ niceShow_9 =((==)
   True,
   "NiceShow-9")
 {------------------------------------------------------------------------------}
+-- NiceRead-1 - Neutral sequent output
+niceRead_1 :: Test
+niceRead_1 =((==)
+  (niceRead "x+ |- x+")
+  (Sequent
+    (IStruct (P (Positive "x")))
+    (OStruct (P (Positive "x")))),
+  True,
+  "NiceRead-1")
+{------------------------------------------------------------------------------}
+-- NiceRead-2 - Left-focused sequent output
+niceRead_2 :: Test
+niceRead_2 =((==)
+  (niceRead "[x+] |- x+")
+  (Sequent
+    (FIStruct (P (Positive "x")))
+    (OStruct (P (Positive "x")))),
+  True,
+  "NiceRead-2")
+{------------------------------------------------------------------------------}
+-- NiceRead-3 - Right-focused sequent output
+niceRead_3 :: Test
+niceRead_3 =((==)
+  (niceRead "x+ |- [x+]")
+  (Sequent
+    (IStruct (P (Positive "x")))
+    (FOStruct (P (Positive "x")))),
+  True,
+  "NiceRead-3")
+{------------------------------------------------------------------------------}
+-- NiceRead-4 - Tensors
+niceRead_4 :: Test
+niceRead_4 =((==)
+  (niceRead "(x+ .(x). y+) |- [(x+ (x) y+)]")
+  (Sequent
+    (STensor
+      (IStruct (P (Positive "x")))
+      (IStruct (P (Positive "y"))))
+    (FOStruct
+      (P (Tensor
+        (P (Positive "x"))
+        (P (Positive "y")))))),
+  True,
+  "NiceRead-4")
+{------------------------------------------------------------------------------}
+-- NiceRead-5 - Sums
+niceRead_5 :: Test
+niceRead_5 =((==)
+  (niceRead "[(x- (+) y-)] |- (x- .(+). y-)")
+  (Sequent
+    (FIStruct
+      (N (Sum
+        (N (Negative "x"))
+        (N (Negative "y")))))
+    (SSum
+      (OStruct (N (Negative "x")))
+      (OStruct (N (Negative "y"))))),
+  True,
+  "NiceRead-5")
+{------------------------------------------------------------------------------}
+-- NiceRead-6 - Left division
+niceRead_6 :: Test
+niceRead_6 =((==)
+  (niceRead "[(x+ \\ y-)] |- (x+ .\\. y-)")
+  (Sequent
+    (FIStruct
+      (N (LDiv
+        (P (Positive "x"))
+        (N (Negative "y")))))
+    (SLDiv
+      (IStruct (P (Positive "x")))
+      (OStruct (N (Negative "y"))))),
+  True,
+  "NiceRead-6")
+{------------------------------------------------------------------------------}
+-- NiceRead-7 - Right division
+niceRead_7 :: Test
+niceRead_7 =((==)
+  (niceRead "[(y- / x+)] |- (y- ./. x+)")
+  (Sequent
+    (FIStruct
+      (N (RDiv
+        (N (Negative "y"))
+        (P (Positive "x")))))
+    (SRDiv
+      (OStruct (N (Negative "y")))
+      (IStruct (P (Positive "x"))))),
+  True,
+  "NiceRead-7")
+{------------------------------------------------------------------------------}
+-- NiceRead-8 - Left difference
+niceRead_8 :: Test
+niceRead_8 =((==)
+  (niceRead "(y- .(\\). x+) |- [(y- (\\) x+)]")
+  (Sequent
+    (SLDiff
+      (OStruct (N (Negative "y")))
+      (IStruct (P (Positive "x"))))
+    (FOStruct
+      (P (LDiff
+        (N (Negative "y"))
+        (P (Positive "x")))))),
+  True,
+  "NiceRead-8")
+{------------------------------------------------------------------------------}
+-- NiceRead-9 - Right difference
+niceRead_9 :: Test
+niceRead_9 =((==)
+  (niceRead "(x+ .(/). y-) |- [(x+ (/) y-)]")
+  (Sequent
+    (SRDiff
+      (IStruct (P (Positive "x")))
+      (OStruct (N (Negative "y"))))
+    (FOStruct
+      (P (RDiff
+        (P (Positive "x"))
+        (N (Negative "y")))))),
+  True,
+  "NiceRead-9")
+{------------------------------------------------------------------------------}
 -- Show/Read test list
 srTests :: [Test]
 srTests = [niceShow_1, niceShow_2, niceShow_3, niceShow_4, niceShow_5,
-  niceShow_6, niceShow_7, niceShow_8, niceShow_9]
+  niceShow_6, niceShow_7, niceShow_8, niceShow_9, niceRead_1, niceRead_2,
+  niceRead_3, niceRead_4, niceRead_5, niceRead_6, niceRead_7, niceRead_8,
+  niceRead_9]
 
 {------------------------------------------------------------------------------}
 -- Axiom block
