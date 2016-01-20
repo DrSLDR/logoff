@@ -150,8 +150,44 @@ sequent = Parser (\cs -> return (Sequent (IStruct (P (Positive "y"))) (OStruct (
 atom :: Parser Formula
 atom = Parser (\cs -> let
   residue = snd polparse
-  polparse = (head . apply (symb "+" +++ symb "-")) (snd strparse)
+  polparse = (head . apply polarity) (snd strparse)
   strparse = (head . apply (many1 (sat isAlphaNum))) cs
   in case fst polparse of
     "+" -> [(P (Positive (fst strparse)), residue)]
     "-" -> [(N (Negative (fst strparse)), residue)])
+
+-- polarity is an atom-level parser to parse the polarity flags
+polarity :: Parser String
+polarity = symb "+" +++ symb "-"
+
+-- formula parses non-structural (nested) formulas, both positive and negative
+formula :: Parser Formula
+formula = Parser (\cs -> let
+  l = (head . apply (nested formula +++ atom)) cs
+  c = (head . apply connective) (snd l)
+  r = (head . apply (nested formula +++ atom)) (snd c)
+  residue = snd r
+  in case fst c of
+    "(x)" -> [(P (Tensor (fst l) (fst r)),residue)]
+    "(/)" -> [(P (RDiff (fst l) (fst r)),residue)]
+    "(\\)"-> [(P (LDiff (fst l) (fst r)),residue)]
+    "(+)" -> [(N (Sum (fst l) (fst r)),residue)]
+    "/"   -> [(N (RDiv (fst l) (fst r)),residue)]
+    "\\"  -> [(N (LDiv (fst l) (fst r)),residue)])
+
+-- connective is a formula-level parser to parse (logical) connectives
+connective :: Parser String
+connective = (foldl1 (+++) . map symb) ["(+)","(x)","(/)","(\\)","/","\\"]
+
+-- bracket is a parser-builder to determine if an input contains something
+-- inside brackets
+bracket :: Parser a -> Parser b -> Parser c -> Parser b
+bracket open p close = do
+  open
+  out <- p
+  close
+  return out
+
+-- nested is a parser-builder to determine if an input is nested in parentheses
+nested :: Parser a -> Parser a
+nested p = bracket (symb "(") p (symb ")")
