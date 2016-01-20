@@ -5,6 +5,7 @@
 
 import Logoff
 import Datatypes
+import TAP
 import Control.Monad
 import System.Exit
 
