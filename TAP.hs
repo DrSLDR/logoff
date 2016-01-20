@@ -135,8 +135,23 @@ apply p = parse (do {space; p})
 -- niceRead parses the given string using the sequent parser and returns the
 -- sequent
 niceRead :: String -> Sequent
-niceRead = fst . head . apply sequent
+niceRead = extract . apply sequent
+
+-- extraction function gets the relevant value from the parser
+extract :: [(a,String)] -> a
+extract [] = error "Parser crash!"
+extract l = (fst . head) l
 
 -- sequent is the top-level sequent parser
 sequent :: Parser Sequent
 sequent = Parser (\cs -> return (Sequent (IStruct (P (Positive "y"))) (OStruct (P (Positive "y"))),cs))
+
+-- atom parses single- or multi-letter atoms and their polarity
+atom :: Parser Formula
+atom = Parser (\cs -> let
+  residue = snd polparse
+  polparse = (head . apply (symb "+" +++ symb "-")) (snd strparse)
+  strparse = (head . apply (many1 (sat isAlphaNum))) cs
+  in case fst polparse of
+    "+" -> [(P (Positive (fst strparse)), residue)]
+    "-" -> [(N (Negative (fst strparse)), residue)])
