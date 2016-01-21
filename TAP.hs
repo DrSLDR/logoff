@@ -165,7 +165,7 @@ formula :: Parser Formula
 formula = Parser (\cs -> case apply (nested formula +++ atom) cs of
   [] -> []
   ((l,res):_) -> case apply connective res of
-    [] -> []
+    [] -> [(l,res)] -- 2 possibilities: parentheses or broken connective
     ((c,res):_) -> case apply (nested formula +++ atom) res of
       [] -> []
       ((r,res):_) -> case c of
