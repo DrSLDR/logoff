@@ -148,13 +148,13 @@ sequent = Parser (\cs -> return (Sequent (IStruct (P (Positive "y"))) (OStruct (
 
 -- atom parses single- or multi-letter atoms and their polarity
 atom :: Parser Formula
-atom = Parser (\cs -> let
-  residue = snd polparse
-  polparse = (head . apply polarity) (snd strparse)
-  strparse = (head . apply (many1 (sat isAlphaNum))) cs
-  in case fst polparse of
-    "+" -> [(P (Positive (fst strparse)), residue)]
-    "-" -> [(N (Negative (fst strparse)), residue)])
+atom = Parser (\cs -> case apply (many1 (sat isAlphaNum)) cs of
+  [] -> []
+  ((a,res):_) -> case apply polarity res of
+    [] -> []
+    ((p,res):_) -> case p of
+      "+" -> [(P (Positive a), res)]
+      "-" -> [(N (Negative a), res)])
 
 -- polarity is an atom-level parser to parse the polarity flags
 polarity :: Parser String
@@ -162,18 +162,19 @@ polarity = symb "+" +++ symb "-"
 
 -- formula parses non-structural (nested) formulas, both positive and negative
 formula :: Parser Formula
-formula = Parser (\cs -> let
-  l = (head . apply (nested formula +++ atom)) cs
-  c = (head . apply connective) (snd l)
-  r = (head . apply (nested formula +++ atom)) (snd c)
-  residue = snd r
-  in case fst c of
-    "(x)" -> [(P (Tensor (fst l) (fst r)),residue)]
-    "(/)" -> [(P (RDiff (fst l) (fst r)),residue)]
-    "(\\)"-> [(P (LDiff (fst l) (fst r)),residue)]
-    "(+)" -> [(N (Sum (fst l) (fst r)),residue)]
-    "/"   -> [(N (RDiv (fst l) (fst r)),residue)]
-    "\\"  -> [(N (LDiv (fst l) (fst r)),residue)])
+formula = Parser (\cs -> case apply (nested formula +++ atom) cs of
+  [] -> []
+  ((l,res):_) -> case apply connective res of
+    [] -> []
+    ((c,res):_) -> case apply (nested formula +++ atom) res of
+      [] -> []
+      ((r,res):_) -> case c of
+        "(x)" -> [(P (Tensor l r),res)]
+        "(/)" -> [(P (RDiff l r),res)]
+        "(\\)"-> [(P (LDiff l r),res)]
+        "(+)" -> [(N (Sum l r),res)]
+        "/"   -> [(N (RDiv l r),res)]
+        "\\"  -> [(N (LDiv l r),res)])
 
 -- connective is a formula-level parser to parse (logical) connectives
 connective :: Parser String

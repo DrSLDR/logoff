@@ -30,6 +30,7 @@ Proof searcher for Focused Lambek-Grishin (LGf) calculus
 - [ ] Input/Output
   - [x] Nicely formated output
   - [ ] Input parsing
+    - [ ] A (QuickCheck) testing suite for the parser (_an exercise for the reader_)
 - [ ] Top-down proofing algorithm
 - There will be more...
 
