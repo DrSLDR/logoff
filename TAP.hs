@@ -192,3 +192,71 @@ bracket open p close = do
 -- nested is a parser-builder to determine if an input is nested in parentheses
 nested :: Parser a -> Parser a
 nested p = bracket (symb "(") p (symb ")")
+
+-- instructure starts parsing input structures and handles focus
+instructure :: Parser IStructure
+instructure = Parser (\cs -> case apply (focused formula) cs of
+  ((f,res):_) -> [(FIStruct f, res)]
+  [] -> apply instructure2 cs)
+
+-- instructure1 parses non-focused logical structures
+instructure1 :: Parser IStructure
+instructure1 = Parser (\cs -> case apply formula cs of
+  ((f,res):_) -> [(IStruct f,res)]
+  [] -> apply instructure2 cs)
+
+-- instructure2 parses structural input-connectives
+instructure2 :: Parser IStructure
+instructure2 = Parser (\cs -> case
+  apply (instructure1 +++ nested instructure2) cs of
+  ((l,res):_) -> case apply (symb ".(x)." +++ symb ".(/).") res of
+    [] -> [(l,res)] -- May be unneccesary nesting
+    ((c,res):_) -> case c of
+      ".(x)." -> case apply (instructure1 +++ nested instructure2) res of
+        ((r,res):_) -> [(STensor l r,res)]
+        [] -> []
+      ".(/)." -> case apply outstructure2 res of
+        ((r,res):_) -> [(SRDiff l r,res)]
+  [] -> case apply outstructure2 cs of
+    ((l,res):_) -> case apply (symb ".(\\).") res of
+      ((_,res):_) -> case apply (instructure1 +++ nested instructure2) res of
+        ((r,res):_) -> [(SLDiff l r,res)]
+        [] -> []
+      [] -> [] -- Can't hide an OStructure inside nesting
+    [] -> [])
+
+-- outstructure starts parsing output structures and handles focus
+outstructure :: Parser OStructure
+outstructure = Parser (\cs -> case apply (focused formula) cs of
+  ((f,res):_) -> [(FOStruct f, res)]
+  [] -> apply outstructure2 cs)
+
+-- outstructure1 parses non-focused logical structures
+outstructure1 :: Parser OStructure
+outstructure1 = Parser (\cs -> case apply formula cs of
+  ((f,res):_) -> [(OStruct f,res)]
+  [] -> apply outstructure2 cs)
+
+-- outstructure2 parses structural output-connectives
+outstructure2 :: Parser OStructure
+outstructure2 = Parser (\cs -> case
+  apply (outstructure1 +++ nested outstructure2) cs of
+  ((l,res):_) -> case apply (symb ".(+)." +++ symb "./.") res of
+    [] -> [(l,res)] -- May be unneccesary nesting
+    ((c,res):_) -> case c of
+      ".(+)." -> case apply (outstructure1 +++ nested outstructure2) res of
+        ((r,res):_) -> [(SSum l r,res)]
+        [] -> []
+      "./." -> case apply instructure2 res of
+        ((r,res):_) -> [(SRDiv l r,res)]
+  [] -> case apply instructure2 cs of
+    ((l,res):_) -> case apply (symb ".(\\).") res of
+      ((_,res):_) -> case apply (outstructure1 +++ nested outstructure2) res of
+        ((r,res):_) -> [(SLDiv l r,res)]
+        [] -> []
+      [] -> [] -- Can't hide an IStructure inside nesting
+    [] -> [])
+
+-- focused is a parser-builder to determine id an input is focused
+focused :: Parser a -> Parser a
+focused p = bracket (symb "[") p (symb "]")
