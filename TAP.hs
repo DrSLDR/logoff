@@ -144,7 +144,19 @@ extract l = (fst . head) l
 
 -- sequent is the top-level sequent parser
 sequent :: Parser Sequent
-sequent = Parser (\cs -> return (Sequent (IStruct (P (Positive "y"))) (OStruct (P (Positive "y"))),cs))
+sequent = Parser (\cs -> case apply instructure cs of
+  ((i,res):_) -> case apply (symb "|-") res of
+    ((_,res):_) -> case apply outstructure res of
+      ((o,_):_) -> let s = Sequent i o in [(s,"") | saneSeq s]
+      [] -> []
+    [] -> []
+  [] -> [])
+
+-- saneSeq is a sanity check on parsed sequents
+-- Specifically, it tests that the sequent isn't focused on both sides
+saneSeq :: Sequent -> Bool
+saneSeq (Sequent (FIStruct _) (FOStruct _)) = False
+saneSeq _ = True
 
 -- atom parses single- or multi-letter atoms and their polarity
 atom :: Parser Formula
@@ -165,7 +177,7 @@ formula :: Parser Formula
 formula = Parser (\cs -> case apply (nested formula +++ atom) cs of
   [] -> []
   ((l,res):_) -> case apply connective res of
-    [] -> [(l,res)] -- 2 possibilities: parentheses or broken connective
+    [] -> [(l,res)] -- 2 possibilities: nesting or broken connective
     ((c,res):_) -> case apply (nested formula +++ atom) res of
       [] -> []
       ((r,res):_) -> case c of
@@ -203,7 +215,7 @@ instructure = Parser (\cs -> case apply (focused formula) cs of
 instructure1 :: Parser IStructure
 instructure1 = Parser (\cs -> case apply formula cs of
   ((f,res):_) -> [(IStruct f,res)]
-  [] -> apply instructure2 cs)
+  [] -> [])
 
 -- instructure2 parses structural input-connectives
 instructure2 :: Parser IStructure
@@ -235,7 +247,7 @@ outstructure = Parser (\cs -> case apply (focused formula) cs of
 outstructure1 :: Parser OStructure
 outstructure1 = Parser (\cs -> case apply formula cs of
   ((f,res):_) -> [(OStruct f,res)]
-  [] -> apply outstructure2 cs)
+  [] -> [])
 
 -- outstructure2 parses structural output-connectives
 outstructure2 :: Parser OStructure
