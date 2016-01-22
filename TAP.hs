@@ -209,7 +209,10 @@ nested p = bracket (symb "(") p (symb ")")
 instructure :: Parser IStructure
 instructure = Parser (\cs -> case apply (focused formula) cs of
   ((f,res):_) -> [(FIStruct f, res)]
-  [] -> apply instructure2 cs)
+  [] -> case apply (symb "[") cs of
+    [] -> apply instructure2 cs
+    _ -> [] -- Thou shalt not focus structural formulas
+    )
 
 -- instructure1 parses non-focused logical structures
 instructure1 :: Parser IStructure
@@ -241,7 +244,10 @@ instructure2 = Parser (\cs -> case
 outstructure :: Parser OStructure
 outstructure = Parser (\cs -> case apply (focused formula) cs of
   ((f,res):_) -> [(FOStruct f, res)]
-  [] -> apply outstructure2 cs)
+  [] -> case apply (symb "[") cs of
+    [] -> apply outstructure2 cs
+    _ -> [] -- See above
+    )
 
 -- outstructure1 parses non-focused logical structures
 outstructure1 :: Parser OStructure
