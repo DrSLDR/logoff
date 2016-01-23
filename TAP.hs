@@ -130,13 +130,26 @@ apply :: Parser a -> String -> [(a,String)]
 apply p = parse (do {space; p})
 
 {------------------------------------------------------------------------------}
+-- Nice-input read class
+{------------------------------------------------------------------------------}
+class NiceRead a where
+  niceRead :: String -> a
+
+instance NiceRead Formula where
+  niceRead = extract . apply formula
+
+instance NiceRead IStructure where
+  niceRead = extract . apply instructure
+
+instance NiceRead OStructure where
+  niceRead = extract . apply outstructure
+
+instance NiceRead Sequent where
+  niceRead = extract . apply sequent
+
+{------------------------------------------------------------------------------}
 -- NiceRead extensions
 {------------------------------------------------------------------------------}
--- niceRead parses the given string using the sequent parser and returns the
--- sequent
-niceRead :: String -> Sequent
-niceRead = extract . apply sequent
-
 -- extraction function gets the relevant value from the parser
 extract :: [(a,String)] -> a
 extract [] = error "Parser crash!"
