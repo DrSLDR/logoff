@@ -11,14 +11,14 @@ import Datatypes
 {------------------------------------------------------------------------------}
 -- isAx verifies if a sequent is an Ax-type axiom
 isAx :: Sequent -> Bool
-isAx (Sequent (IStruct (P inf)) (FOStruct  (P ouf))) =
-  ouf == inf
+isAx (Sequent (IStruct (P (Positive i))) (FOStruct  (P (Positive o)))) =
+  o == i
 isAx _ = False
 
 -- isCoAx verifies if a sequent is a CoAx-type axiom
 isCoAx :: Sequent -> Bool
-isCoAx (Sequent (FIStruct  (N inf)) (OStruct (N ouf))) =
-  ouf == inf
+isCoAx (Sequent (FIStruct  (N (Negative i))) (OStruct (N (Negative o)))) =
+  o == i
 isCoAx _ = False
 
 {------------------------------------------------------------------------------}
