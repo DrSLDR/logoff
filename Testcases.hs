@@ -793,10 +793,10 @@ res1i_1 = ((==)
         (IStruct (P (Positive "x")))
         (OStruct (N (Negative "z"))))))
   (Sequent
-    (IStruct (P (Positive "y")))
-    (SLDiv
+    (STensor
       (IStruct (P (Positive "x")))
-      (OStruct (N (Negative "z"))))),
+      (IStruct (P (Positive "y"))))
+    (OStruct (N (Negative "z")))),
   True,
   "res1i-1")
 {------------------------------------------------------------------------------}
@@ -806,10 +806,10 @@ res1i_2 :: Test
 res1i_2 = ((==)
   (residuate1i
     (Sequent
-      (IStruct (P (Positive "y")))
-      (SLDiv
+      (STensor
         (IStruct (P (Positive "x")))
-        (OStruct (N (Negative "z"))))))
+        (IStruct (P (Positive "y"))))
+      (OStruct (N (Negative "z")))))
   (Sequent
     (IStruct (P (Positive "x")))
     (SRDiv
