@@ -1,4 +1,4 @@
-# logoff
+# LoGoff
 Proof searcher for Focused Lambek-Grishin (LGf) calculus
 
 [![](https://travis-ci.org/DrSLDR/logoff.svg?branch=master)](https://travis-ci.org/DrSLDR/logoff)
