@@ -89,3 +89,31 @@ monoRDiff :: Sequent -> Sequent -> Sequent
 monoRDiff (Sequent xi (FOStruct xo)) (Sequent (FIStruct yi) yo) =
   Sequent (SRDiff xi yo) (FOStruct (P (RDiff xo yi)))
 monoRDiff l r = l
+
+{------------------------------------------------------------------------------}
+-- Residuation block
+-- Note that if the functions can't treat the given sequent, they return it
+{------------------------------------------------------------------------------}
+-- residuate1 - Downwards R1 rule
+residuate1 :: Sequent -> Sequent
+residuate1 (Sequent x (SRDiv z y)) = Sequent (STensor x y) z
+residuate1 (Sequent (STensor x y) z) = Sequent y (SLDiv x z)
+residuate1 s = s
+
+-- residuate1i - Upwards (inverted) R1 rule
+residuate1i :: Sequent -> Sequent
+residuate1i (Sequent y (SLDiv x z)) = Sequent (STensor x y) z
+residuate1i (Sequent (STensor x y) z) = Sequent x (SRDiv z y)
+residuate1i s = s
+
+-- residuate2 - Downwards R2 rule
+residuate2 :: Sequent -> Sequent
+residuate2 (Sequent (SLDiff y z) x) = Sequent z (SSum y x)
+residuate2 (Sequent z (SSum y x)) = Sequent (SRDiff z x) y
+residuate2 s = s
+
+-- residuate2i - Upwards (inverted) R2 rule
+residuate2i :: Sequent -> Sequent
+residuate2i (Sequent (SRDiff z x) y) = Sequent z (SSum y x)
+residuate2i (Sequent z (SSum y x)) = Sequent (SLDiff y z) x
+residuate2i s = s
