@@ -295,12 +295,95 @@ niceRead_9 =((==)
   True,
   "NiceRead-9")
 {------------------------------------------------------------------------------}
+-- Bi-directional-1 - Left-focused sequent
+bidirectional_1 :: Test
+bidirectional_1 =(let s = "x+ |- x+"
+                      i = niceRead s :: Sequent
+                      o = niceShow i in
+  o == s,
+  True,
+  "Bi-directional-1")
+{------------------------------------------------------------------------------}
+-- Bi-directional-2 - Left-focused sequent
+bidirectional_2 :: Test
+bidirectional_2 =(let s = "[x+] |- x+"
+                      i = niceRead s :: Sequent
+                      o = niceShow i in
+  o == s,
+  True,
+  "Bi-directional-2")
+{------------------------------------------------------------------------------}
+-- Bi-directional-3 - Right-focused sequent
+bidirectional_3 :: Test
+bidirectional_3 =(let s = "x+ |- [x+]"
+                      i = niceRead s :: Sequent
+                      o = niceShow i in
+  o == s,
+  True,
+  "Bi-directional-3")
+{------------------------------------------------------------------------------}
+-- Bi-directional-4 - Tensors
+bidirectional_4 :: Test
+bidirectional_4 =(let s = "(x+ .(x). y+) |- [(x+ (x) y+)]"
+                      i = niceRead s :: Sequent
+                      o = niceShow i in
+  o == s,
+  True,
+  "Bi-directional-4")
+{------------------------------------------------------------------------------}
+-- Bi-directional-5 - Sums
+bidirectional_5 :: Test
+bidirectional_5 =(let s = "[(x- (+) y-)] |- (x- .(+). y-)"
+                      i = niceRead s :: Sequent
+                      o = niceShow i in
+  o == s,
+  True,
+  "Bi-directional-5")
+{------------------------------------------------------------------------------}
+-- Bi-directional-6 - Left division
+bidirectional_6 :: Test
+bidirectional_6 =(let s = "[(x+ \\ y-)] |- (x+ .\\. y-)"
+                      i = niceRead s :: Sequent
+                      o = niceShow i in
+  o == s,
+  True,
+  "Bi-directional-6")
+{------------------------------------------------------------------------------}
+-- Bi-directional-7 - Right division
+bidirectional_7 :: Test
+bidirectional_7 =(let s = "[(y- / x+)] |- (y- ./. x+)"
+                      i = niceRead s :: Sequent
+                      o = niceShow i in
+  o == s,
+  True,
+  "Bi-directional-7")
+{------------------------------------------------------------------------------}
+-- Bi-directional-8 - Left difference
+bidirectional_8 :: Test
+bidirectional_8 =(let s = "(y- .(\\). x+) |- [(y- (\\) x+)]"
+                      i = niceRead s :: Sequent
+                      o = niceShow i in
+  o == s,
+  True,
+  "Bi-directional-8")
+{------------------------------------------------------------------------------}
+-- Bi-directional-9 - Right difference
+bidirectional_9 :: Test
+bidirectional_9 =(let s = "(x+ .(/). y-) |- [(x+ (/) y-)]"
+                      i = niceRead s :: Sequent
+                      o = niceShow i in
+  o == s,
+  True,
+  "Bi-directional-9")
+{------------------------------------------------------------------------------}
 -- Show/Read test list
 srTests :: [Test]
 srTests = [niceShow_1, niceShow_2, niceShow_3, niceShow_4, niceShow_5,
   niceShow_6, niceShow_7, niceShow_8, niceShow_9, niceRead_1, niceRead_2,
   niceRead_3, niceRead_4, niceRead_5, niceRead_6, niceRead_7, niceRead_8,
-  niceRead_9]
+  niceRead_9, bidirectional_1, bidirectional_2, bidirectional_3,
+  bidirectional_4, bidirectional_5, bidirectional_6, bidirectional_7,
+  bidirectional_8, bidirectional_9]
 
 {------------------------------------------------------------------------------}
 -- Axiom block
