@@ -41,7 +41,7 @@ evaluateResult = all fst
 
 -- Master test list
 tests :: [Test]
-tests = srTests ++ axTests ++ focusTests ++ monoTests ++ resTests
+tests = srTests ++ axTests ++ focusTests ++ monoTests ++ iMonoTests ++ resTests
 
 {------------------------------------------------------------------------------}
 -- Show/Read block
@@ -866,7 +866,6 @@ iMonoRDiff_1 = ((==)
 iMonoTests :: [Test]
 iMonoTests = [iMonoTensor_1, iMonoSum_1, iMonoLDiv_1, iMonoRDiv_1, iMonoLDiff_1,
   iMonoRDiff_1]
-
 
 {------------------------------------------------------------------------------}
 -- Residuation block
