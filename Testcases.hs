@@ -726,6 +726,149 @@ monoTests = [monoTensor_1, monoSum_1, monoLDiv_1, monoRDiv_1, monoLDiff_1,
   monoRDiff_1]
 
 {------------------------------------------------------------------------------}
+-- Inverse monotonicity block
+{------------------------------------------------------------------------------}
+-- iMonoTensor-1 - Simple, axiomatic test
+-- (x+ .(x). y+) |- [(x+ (x) y+)] => x+ |- [x+]; y+ |- [y+]
+iMonoTensor_1 :: Test
+iMonoTensor_1 = ((==)
+  (iMonoTensor
+    (Sequent
+      (STensor
+        (IStruct (P (Positive "x")))
+        (IStruct (P (Positive "y"))))
+      (FOStruct
+        (P (Tensor
+          (P (Positive "x"))
+          (P (Positive "y")))))))
+  (Sequent
+    (IStruct (P (Positive "x")))
+    (FOStruct (P (Positive "x"))),
+  Sequent
+    (IStruct (P (Positive "y")))
+    (FOStruct (P (Positive "y")))),
+  True,
+  "iMonoTensor-1"
+  )
+{------------------------------------------------------------------------------}
+-- iMonoSum-1 - Simple, axiomatic test
+-- [(x- (+) y-)] |- (x- .(+). y-) => [x-] |- x-; [y-] |- y-
+iMonoSum_1 :: Test
+iMonoSum_1 = ((==)
+  (iMonoSum
+    (Sequent
+      (FIStruct
+        (N (Sum
+          (N (Negative "x"))
+          (N (Negative "y")))))
+      (SSum
+        (OStruct (N (Negative "x")))
+        (OStruct (N (Negative "y"))))))
+  (Sequent
+    (FIStruct (N (Negative "x")))
+    (OStruct (N (Negative "x"))),
+  Sequent
+    (FIStruct (N (Negative "y")))
+    (OStruct (N (Negative "y")))),
+  True,
+  "iMonoSum-1"
+  )
+{------------------------------------------------------------------------------}
+-- iMonoLDiv-1 - Simple, axiomatic test
+-- [(x+ \ y-)] |- (x+ .\. y-) => x+ |- [x+]; [y-] |- y-
+iMonoLDiv_1 :: Test
+iMonoLDiv_1 = ((==)
+  (iMonoLDiv
+    (Sequent
+      (FIStruct
+        (N (LDiv
+          (P (Positive "x"))
+          (N (Negative "y")))))
+      (SLDiv
+        (IStruct (P (Positive "x")))
+        (OStruct (N (Negative "y"))))))
+  (Sequent
+    (IStruct (P (Positive "x")))
+    (FOStruct (P (Positive "x"))),
+  Sequent
+    (FIStruct (N (Negative "y")))
+    (OStruct (N (Negative "y")))),
+  True,
+  "iMonoLDiv-1")
+{------------------------------------------------------------------------------}
+-- iMonoRDiv-1 - Simple, axiomatic test
+-- [(y- / x+)] |- (y- ./. x+) => x+ |- [x+]; [y-] |- y-
+iMonoRDiv_1 :: Test
+iMonoRDiv_1 = ((==)
+  (iMonoRDiv
+    (Sequent
+      (FIStruct
+        (N (RDiv
+          (N (Negative "y"))
+          (P (Positive "x")))))
+      (SRDiv
+        (OStruct (N (Negative "y")))
+        (IStruct (P (Positive "x"))))))
+  (Sequent
+    (IStruct (P (Positive "x")))
+    (FOStruct (P (Positive "x"))),
+  Sequent
+    (FIStruct (N (Negative "y")))
+    (OStruct (N (Negative "y")))),
+  True,
+  "iMonoRDiv-1")
+{------------------------------------------------------------------------------}
+-- iMonoLDiff-1 - Simple, axiomatic test
+-- (y- .(\). x+) |- [(y- (\) x+)] => x+ |- [x+]; [y-] |- y-
+iMonoLDiff_1 :: Test
+iMonoLDiff_1 = ((==)
+  (iMonoLDiff
+    (Sequent
+      (SLDiff
+        (OStruct (N (Negative "y")))
+        (IStruct (P (Positive "x"))))
+      (FOStruct
+        (P (LDiff
+          (N (Negative "y"))
+          (P (Positive "x")))))))
+  (Sequent
+    (IStruct (P (Positive "x")))
+    (FOStruct (P (Positive "x"))),
+  Sequent
+    (FIStruct (N (Negative "y")))
+    (OStruct (N (Negative "y")))),
+  True,
+  "iMonoLDiff-1")
+{------------------------------------------------------------------------------}
+-- iMonoRDiff-1 - Simple, axiomatic test
+-- (x+ .(/). y-) |- [(x+ (/) y-)] => x+ |- [x+]; [y-] |- y-
+iMonoRDiff_1 :: Test
+iMonoRDiff_1 = ((==)
+  (iMonoRDiff
+    (Sequent
+      (SRDiff
+        (IStruct (P (Positive "x")))
+        (OStruct (N (Negative "y"))))
+      (FOStruct
+        (P (RDiff
+          (P (Positive "x"))
+          (N (Negative "y")))))))
+  (Sequent
+    (IStruct (P (Positive "x")))
+    (FOStruct (P (Positive "x"))),
+  Sequent
+    (FIStruct (N (Negative "y")))
+    (OStruct (N (Negative "y")))),
+  True,
+  "iMonoRDiff-1")
+{------------------------------------------------------------------------------}
+-- Inverse onotonicity test list
+iMonoTests :: [Test]
+iMonoTests = [iMonoTensor_1, iMonoSum_1, iMonoLDiv_1, iMonoRDiv_1, iMonoLDiff_1,
+  iMonoRDiff_1]
+
+
+{------------------------------------------------------------------------------}
 -- Residuation block
 {------------------------------------------------------------------------------}
 -- res1_1 -- First step, residuation 1

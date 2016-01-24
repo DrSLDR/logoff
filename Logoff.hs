@@ -91,6 +91,46 @@ monoRDiff (Sequent xi (FOStruct xo)) (Sequent (FIStruct yi) yo) =
 monoRDiff l r = l
 
 {------------------------------------------------------------------------------}
+-- Inverse monotonicity block
+-- Note that if the functions can't treat the given sequent, they return it
+{------------------------------------------------------------------------------}
+-- Tensor - removes tensor
+iMonoTensor :: Sequent -> (Sequent, Sequent)
+iMonoTensor (Sequent (STensor xi yi) (FOStruct (P (Tensor xo yo)))) =
+  (Sequent xi (FOStruct xo), Sequent yi (FOStruct yo))
+iMonoTensor s = (s,s)
+
+-- Sum - removes sum
+iMonoSum :: Sequent -> (Sequent, Sequent)
+iMonoSum (Sequent (FIStruct (N (Sum xi yi))) (SSum xo yo)) =
+  (Sequent (FIStruct xi) xo, Sequent (FIStruct yi) yo)
+iMonoSum s = (s,s)
+
+-- Left division - removes LDiv
+iMonoLDiv :: Sequent -> (Sequent, Sequent)
+iMonoLDiv (Sequent (FIStruct (N (LDiv xo yi))) (SLDiv xi yo)) =
+  (Sequent xi (FOStruct xo), Sequent (FIStruct yi) yo)
+iMonoLDiv s = (s,s)
+
+-- Right division - removes RDiv
+iMonoRDiv :: Sequent -> (Sequent, Sequent)
+iMonoRDiv (Sequent (FIStruct (N (RDiv yi xo))) (SRDiv yo xi)) =
+  (Sequent xi (FOStruct xo), Sequent (FIStruct yi) yo)
+iMonoRDiv s = (s,s)
+
+-- Left difference - removes LDiff
+iMonoLDiff :: Sequent -> (Sequent, Sequent)
+iMonoLDiff (Sequent (SLDiff yo xi) (FOStruct (P (LDiff yi xo)))) =
+  (Sequent xi (FOStruct xo), Sequent (FIStruct yi) yo)
+iMonoLDiff s = (s,s)
+
+-- Right difference - removes RDiff
+iMonoRDiff :: Sequent -> (Sequent, Sequent)
+iMonoRDiff (Sequent (SRDiff xi yo) (FOStruct (P (RDiff xo yi)))) =
+  (Sequent xi (FOStruct xo), Sequent (FIStruct yi) yo)
+iMonoRDiff s = (s,s)
+
+{------------------------------------------------------------------------------}
 -- Residuation block
 -- Note that if the functions can't treat the given sequent, they return it
 {------------------------------------------------------------------------------}
