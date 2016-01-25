@@ -579,9 +579,86 @@ focusL_1 = ((==)
   "Focus L-1"
   )
 {------------------------------------------------------------------------------}
+-- Inverse defocus R-1 - Simple defocusing action
+-- x+ |- x+ => x+ |- [x+]
+idefocusR_1 :: Test
+idefocusR_1 = ((==)
+  (idefocusR
+    (Sequent
+      (IStruct
+        (P (Positive "x")))
+      (OStruct
+        (P (Positive "x")))))
+  (Sequent
+    (IStruct
+      (P (Positive "x")))
+    (FOStruct
+      (P (Positive "x")))),
+  True,
+  "Inverse defocus R-1"
+  )
+{------------------------------------------------------------------------------}
+-- Inverse defocus L-1 - Simple defocusing action
+-- x- |- x- => [x-] |- x-
+idefocusL_1 :: Test
+idefocusL_1 = ((==)
+  (idefocusL
+    (Sequent
+      (IStruct
+        (N (Negative "x")))
+      (OStruct
+        (N (Negative"x")))))
+  (Sequent
+    (FIStruct
+      (N (Negative "x")))
+    (OStruct
+      (N (Negative "x")))),
+  True,
+  "Inverse defocus L-1"
+  )
+{------------------------------------------------------------------------------}
+-- Inverse focus R-1 - Simple focusing action
+-- x- |- [x-] => x- |- x-
+ifocusR_1 :: Test
+ifocusR_1 = ((==)
+  (ifocusR
+    (Sequent
+      (IStruct
+        (N (Negative "x")))
+      (FOStruct
+        (N (Negative "x")))))
+  (Sequent
+    (IStruct
+      (N (Negative "x")))
+    (OStruct
+      (N (Negative "x")))),
+  True,
+  "Inverse focus R-1"
+  )
+{------------------------------------------------------------------------------}
+-- Inverse focus L-1 - Simple focusing action
+-- [x+] |- x+ => x+ |- x+
+ifocusL_1 :: Test
+ifocusL_1 = ((==)
+  (ifocusL
+    (Sequent
+      (FIStruct
+        (P (Positive "x")))
+      (OStruct
+        (P (Positive "x")))))
+  (Sequent
+    (IStruct
+      (P (Positive "x")))
+    (OStruct
+      (P (Positive"x")))),
+  True,
+  "Inverse focus L-1"
+  )
+{------------------------------------------------------------------------------}
 -- Focus test list
 focusTests :: [Test]
-focusTests = [defocusR_1, defocusL_1,focusR_1,focusL_1]
+focusTests = [defocusR_1, defocusL_1, focusR_1, focusL_1, idefocusR_1,
+  idefocusL_1, ifocusR_1, ifocusL_1]
 
 {------------------------------------------------------------------------------}
 -- Monotonicity block

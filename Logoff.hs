@@ -5,6 +5,7 @@
 module Logoff where
 
 import Datatypes
+import Data.Maybe
 
 {------------------------------------------------------------------------------}
 -- Axiom block
@@ -27,27 +28,42 @@ isCoAx _ = False
 {------------------------------------------------------------------------------}
 -- Defocus right (or top-down focus right)
 defocusR :: Sequent -> Sequent
-defocusR (Sequent i (FOStruct (P o))) =
-  Sequent i (OStruct (P o))
+defocusR (Sequent i (FOStruct (P o))) = Sequent i (OStruct (P o))
 defocusR s = s
+
+-- Inverse defocus right (top-down focus right)
+idefocusR :: Sequent -> Sequent
+idefocusR (Sequent i (OStruct (P o))) = Sequent i (FOStruct (P o))
+idefocusR s = s
 
 -- Defocus left (or top-down focus left)
 defocusL :: Sequent -> Sequent
-defocusL (Sequent (FIStruct (N i)) o) =
-  Sequent (IStruct (N i)) o
+defocusL (Sequent (FIStruct (N i)) o) = Sequent (IStruct (N i)) o
 defocusL s = s
+
+-- Inverse defocus left (top-down focus left)
+idefocusL :: Sequent -> Sequent
+idefocusL (Sequent (IStruct (N i)) o) = Sequent (FIStruct (N i)) o
+idefocusL s = s
 
 -- Focus right (or top-down defocus right)
 focusR :: Sequent -> Sequent
-focusR (Sequent i (OStruct (N o))) =
-  Sequent i (FOStruct (N o))
+focusR (Sequent i (OStruct (N o))) = Sequent i (FOStruct (N o))
 focusR s = s
+
+-- Inverse focus right (top-down defocus right)
+ifocusR :: Sequent -> Sequent
+ifocusR (Sequent i (FOStruct (N o))) = Sequent i (OStruct (N o))
+ifocusR s = s
 
 -- Focus left (or top-down defocus left)
 focusL :: Sequent -> Sequent
-focusL (Sequent (IStruct (P i)) o) =
-  Sequent (FIStruct (P i)) o
+focusL (Sequent (IStruct (P i)) o) = Sequent (FIStruct (P i)) o
 focusL s = s
+
+-- Inverse focus left (top-down defocus left)
+ifocusL :: Sequent -> Sequent
+ifocusL (Sequent (FIStruct (P i)) o) = Sequent (IStruct (P i)) o
 
 {------------------------------------------------------------------------------}
 -- Monotonicity block
@@ -157,3 +173,38 @@ residuate2i :: Sequent -> Sequent
 residuate2i (Sequent (SRDiff z x) y) = Sequent z (SSum y x)
 residuate2i (Sequent z (SSum y x)) = Sequent (SLDiff y z) x
 residuate2i s = s
+
+{------------------------------------------------------------------------------}
+-- Top-Down solver block
+{------------------------------------------------------------------------------}
+-- tdSolve - Master Top-Down solver
+-- Also, yay maybe monad
+tdSolve :: Sequent -> Maybe ProofTree
+tdSolve s
+  | isAx s = Just (Ax s)
+  | isCoAx s = Just (CoAx s)
+  | otherwise = case tdSolveFocus s of
+    Nothing -> Nothing
+    pt -> pt
+
+-- tdSolveFocus - solves focusing
+tdSolveFocus :: Sequent -> Maybe ProofTree
+tdSolveFocus s@(Sequent i (OStruct (P o))) = case (tdSolve . idefocusR) s of
+  (Just pt) -> Just (Unary s DeFocusR pt)
+  Nothing -> Nothing
+tdSolveFocus s@(Sequent (IStruct (N i)) o) = case (tdSolve . idefocusL) s of
+  (Just pt) -> Just (Unary s DeFocusL pt)
+  Nothing -> Nothing
+tdSolveFocus s@(Sequent i (FOStruct (N o))) = case (tdSolve . ifocusR) s of
+  (Just pt) -> Just (Unary s FocusR pt)
+  Nothing -> Nothing
+tdSolveFocus s@(Sequent (FIStruct (P i)) o) = case (tdSolve . ifocusL) s of
+  (Just pt) -> Just (Unary s FocusL pt)
+  Nothing -> Nothing
+tdSolveFocus _ = Nothing
+
+-- -- tdSolveMono - solves inverse monotonicity
+-- tdSolveMono :: Sequent -> Maybe ProofTree
+--
+--
+-- tdSolveRes :: Sequent -> Maybe ProofTree

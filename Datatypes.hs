@@ -97,3 +97,28 @@ type LexItem = (String, Formula)
 
 -- Lexicon type
 type Lexicon = [LexItem]
+
+{------------------------------------------------------------------------------}
+-- Datatypes for proof trees
+{------------------------------------------------------------------------------}
+-- Proof tree datatype
+data ProofTree = Ax Sequent
+  | CoAx Sequent
+  | Unary Sequent Operation ProofTree
+  | Binary Sequent Operation ProofTree ProofTree
+  deriving (Show)
+
+-- Operation datatype
+data Operation = DeFocusL
+  | DeFocusR
+  | FocusL
+  | FocusR
+  | MonoTensor
+  | MonoLDiff
+  | MonoRDiff
+  | MonoSum
+  | MonoLDiv
+  | MonoRDiv
+  | Res1
+  | Res2
+  deriving (Show)
