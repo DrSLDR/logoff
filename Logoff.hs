@@ -183,8 +183,10 @@ tdSolve :: Sequent -> Maybe ProofTree
 tdSolve s
   | isAx s = Just (Ax s)
   | isCoAx s = Just (CoAx s)
-  | otherwise = case tdSolveFocus s of
-    Nothing -> Nothing
+  | otherwise = case tdSolveMono s of
+    Nothing -> case tdSolveFocus s of
+      Nothing -> Nothing
+      pt -> pt
     pt -> pt
 
 -- tdSolveFocus - solves focusing
@@ -193,7 +195,7 @@ tdSolveFocus s = let
   list = [(idefocusR, DeFocusR), (idefocusL, DeFocusL), (ifocusR, FocusR),
     (ifocusL, FocusL)]
   complist = map (\(f,o) -> (f s, o)) list
-  res = dropWhile (\(ns, o) -> s == ns) complist in
+  res = dropWhile (\(ns, _) -> s == ns) complist in
   case res of
     ((ns, o):_) -> case tdSolve ns of
       (Just pt) -> Just (Unary s o pt)
@@ -201,6 +203,18 @@ tdSolveFocus s = let
     [] -> Nothing
 
 -- tdSolveMono - solves inverse monotonicity
--- tdSolveMono :: Sequent -> Maybe ProofTree
+tdSolveMono :: Sequent -> Maybe ProofTree
+tdSolveMono s = let
+  list = [(iMonoTensor, MonoTensor), (iMonoSum, MonoSum), (iMonoLDiv, MonoLDiv),
+    (iMonoRDiv, MonoRDiv), (iMonoLDiff, MonoLDiff), (iMonoRDiff, MonoRDiff)]
+  complist = map (\(f,o) -> (f s, o)) list
+  res = dropWhile (\((ns,_), _) -> s == ns) complist in
+  case res of
+    (((ns1, ns2), o):_) -> case tdSolve ns1 of
+      (Just pt1) -> case tdSolve ns2 of
+        (Just pt2) -> Just (Binary s o pt1 pt2)
+        otherwise -> Nothing
+      otherwise -> Nothing
+    [] -> Nothing
 
 -- tdSolveRes :: Sequent -> Maybe ProofTree
