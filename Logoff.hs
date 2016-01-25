@@ -189,22 +189,18 @@ tdSolve s
 
 -- tdSolveFocus - solves focusing
 tdSolveFocus :: Sequent -> Maybe ProofTree
-tdSolveFocus s@(Sequent i (OStruct (P o))) = case (tdSolve . idefocusR) s of
-  (Just pt) -> Just (Unary s DeFocusR pt)
-  Nothing -> Nothing
-tdSolveFocus s@(Sequent (IStruct (N i)) o) = case (tdSolve . idefocusL) s of
-  (Just pt) -> Just (Unary s DeFocusL pt)
-  Nothing -> Nothing
-tdSolveFocus s@(Sequent i (FOStruct (N o))) = case (tdSolve . ifocusR) s of
-  (Just pt) -> Just (Unary s FocusR pt)
-  Nothing -> Nothing
-tdSolveFocus s@(Sequent (FIStruct (P i)) o) = case (tdSolve . ifocusL) s of
-  (Just pt) -> Just (Unary s FocusL pt)
-  Nothing -> Nothing
-tdSolveFocus _ = Nothing
+tdSolveFocus s = let
+  list = [(idefocusR, DeFocusR), (idefocusL, DeFocusL), (ifocusR, FocusR),
+    (ifocusL, FocusL)]
+  complist = map (\(f,o) -> (f s, o)) list
+  res = dropWhile (\(ns, o) -> s == ns) complist in
+  case res of
+    ((ns, o):_) -> case tdSolve ns of
+      (Just pt) -> Just (Unary s o pt)
+      otherwise -> Nothing
+    [] -> Nothing
 
--- -- tdSolveMono - solves inverse monotonicity
+-- tdSolveMono - solves inverse monotonicity
 -- tdSolveMono :: Sequent -> Maybe ProofTree
---
---
+
 -- tdSolveRes :: Sequent -> Maybe ProofTree
