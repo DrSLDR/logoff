@@ -119,6 +119,12 @@ data Operation = DeFocusL
   | MonoSum
   | MonoLDiv
   | MonoRDiv
-  | Res1
-  | Res2
-  deriving (Show)
+  | Res Residuation
+  deriving (Show, Eq)
+
+-- Residuation operation datatype
+data Residuation = Res1 Int
+  | Res1i Int
+  | Res2 Int
+  | Res2i Int
+  deriving (Show, Eq)

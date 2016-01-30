@@ -64,6 +64,7 @@ focusL s = s
 -- Inverse focus left (top-down defocus left)
 ifocusL :: Sequent -> Sequent
 ifocusL (Sequent (FIStruct (P i)) o) = Sequent (IStruct (P i)) o
+ifocusL s = s
 
 {------------------------------------------------------------------------------}
 -- Monotonicity block
@@ -151,28 +152,28 @@ iMonoRDiff s = (s,s)
 -- Note that if the functions can't treat the given sequent, they return it
 {------------------------------------------------------------------------------}
 -- residuate1 - Downwards R1 rule
-residuate1 :: Sequent -> Sequent
-residuate1 (Sequent x (SRDiv z y)) = Sequent (STensor x y) z
-residuate1 (Sequent (STensor x y) z) = Sequent y (SLDiv x z)
-residuate1 s = s
+residuate1 :: Int -> Sequent -> Sequent
+residuate1 1 (Sequent x (SRDiv z y)) = Sequent (STensor x y) z
+residuate1 2 (Sequent (STensor x y) z) = Sequent y (SLDiv x z)
+residuate1 _ s = s
 
 -- residuate1i - Upwards (inverted) R1 rule
-residuate1i :: Sequent -> Sequent
-residuate1i (Sequent y (SLDiv x z)) = Sequent (STensor x y) z
-residuate1i (Sequent (STensor x y) z) = Sequent x (SRDiv z y)
-residuate1i s = s
+residuate1i :: Int -> Sequent -> Sequent
+residuate1i 2 (Sequent y (SLDiv x z)) = Sequent (STensor x y) z
+residuate1i 1 (Sequent (STensor x y) z) = Sequent x (SRDiv z y)
+residuate1i _ s = s
 
 -- residuate2 - Downwards R2 rule
-residuate2 :: Sequent -> Sequent
-residuate2 (Sequent (SLDiff y z) x) = Sequent z (SSum y x)
-residuate2 (Sequent z (SSum y x)) = Sequent (SRDiff z x) y
-residuate2 s = s
+residuate2 :: Int -> Sequent -> Sequent
+residuate2 1 (Sequent (SLDiff y z) x) = Sequent z (SSum y x)
+residuate2 2 (Sequent z (SSum y x)) = Sequent (SRDiff z x) y
+residuate2 _ s = s
 
 -- residuate2i - Upwards (inverted) R2 rule
-residuate2i :: Sequent -> Sequent
-residuate2i (Sequent (SRDiff z x) y) = Sequent z (SSum y x)
-residuate2i (Sequent z (SSum y x)) = Sequent (SLDiff y z) x
-residuate2i s = s
+residuate2i :: Int -> Sequent -> Sequent
+residuate2i 2 (Sequent (SRDiff z x) y) = Sequent z (SSum y x)
+residuate2i 1 (Sequent z (SSum y x)) = Sequent (SLDiff y z) x
+residuate2i _ s = s
 
 {------------------------------------------------------------------------------}
 -- Top-Down solver block
@@ -185,7 +186,23 @@ tdSolve s
   | isCoAx s = Just (CoAx s)
   | otherwise = case tdSolveMono s of
     Nothing -> case tdSolveFocus s of
-      Nothing -> Nothing
+      Nothing -> case tdSolveRes tdSolveResHelperList s of
+        Nothing -> Nothing
+        pt -> pt
+      pt -> pt
+    pt -> pt
+
+-- tdSolveHelperSpecial - master-solver following a residuation step to prevent
+-- residuation looping
+tdSolveHelperSpecial :: Residuation -> Sequent -> Maybe ProofTree
+tdSolveHelperSpecial res s
+  | isAx s = Just (Ax s)
+  | isCoAx s = Just (CoAx s)
+  | otherwise = case tdSolveMono s of
+    Nothing -> case tdSolveFocus s of
+      Nothing -> case tdSolveRes (tdSolveResHelperPermit res) s of
+        Nothing -> Nothing
+        pt -> pt
       pt -> pt
     pt -> pt
 
@@ -217,4 +234,36 @@ tdSolveMono s = let
       otherwise -> Nothing
     [] -> Nothing
 
--- tdSolveRes :: Sequent -> Maybe ProofTree
+-- tdSolveRes - solves residuation
+tdSolveRes :: [(Sequent -> Sequent, Residuation)] -> Sequent -> Maybe ProofTree
+tdSolveRes permit s = let
+  complist = map (\(f, o) -> (f s, o)) permit
+  residuations = [(ns, o) | (ns,o) <- complist, ns /= s] in
+  case tdSolveResHelperOptions residuations of
+    Nothing -> Nothing
+    (Just (pt, res)) -> Just (Unary s (Res res) pt)
+
+-- tdSolveResHelperOptions - solves residuation, handles the actual branching
+tdSolveResHelperOptions :: [(Sequent, Residuation)] ->
+  Maybe (ProofTree, Residuation)
+tdSolveResHelperOptions [] = Nothing
+tdSolveResHelperOptions ((s, res):xs) =
+  case tdSolveHelperSpecial (tdSolveResHelperGetInverse res) s of
+    Nothing -> tdSolveResHelperOptions xs
+    (Just pt) -> Just (pt, res)
+
+-- tdSolveResHelperPermit - calculates new permit-list
+tdSolveResHelperPermit :: Residuation -> [(Sequent -> Sequent, Residuation)]
+tdSolveResHelperPermit res = filter (\(f, r) -> r /= res) tdSolveResHelperList
+
+-- tdSolveResHelperGetInverse
+tdSolveResHelperGetInverse :: Residuation -> Residuation
+tdSolveResHelperGetInverse (Res1 i) = Res1i i
+tdSolveResHelperGetInverse (Res1i i) = Res1 i
+tdSolveResHelperGetInverse (Res2 i) = Res2i i
+tdSolveResHelperGetInverse (Res2i i) = Res2 i
+
+-- tdSolveResHelperList - list of functions and operation mappings
+tdSolveResHelperList :: [(Sequent -> Sequent, Residuation)]
+tdSolveResHelperList = [(f i,o i) | (f,o) <- [(residuate1, Res1),
+  (residuate2, Res2), (residuate1i, Res1i), (residuate2i, Res2i)], i <- [1,2]]
