@@ -45,6 +45,35 @@ instance NiceShow OStructure where
 instance NiceShow Sequent where
   niceShow (Sequent is os) = niceShow is ++ " |- " ++ niceShow os
 
+instance NiceShow ProofTree where
+  niceShow (Ax s) = niceShow s ++ " [Ax]"
+  niceShow (CoAx s) = niceShow s ++ " [CoAx]"
+  niceShow (Unary s o pt) = niceShow pt ++ " =>\n" ++ niceShow o ++ " " ++
+    niceShow s
+  niceShow (Binary s o pt1 pt2) = "(" ++ niceShow pt2 ++ " :R)=>\n" ++ "(" ++
+    niceShow pt1 ++ " :L)=>\n" ++ niceShow o ++ " " ++ niceShow s
+
+
+instance NiceShow Operation where
+  niceShow o = case o of
+    DeFocusL -> "[Left Defocus]"
+    DeFocusR -> "[Right Defocus]"
+    FocusL -> "[Left Focus]"
+    FocusR -> "[Right Focus]"
+    MonoTensor -> "[Tensor Monotonicity]"
+    MonoLDiff -> "[Left Difference Monotonicity]"
+    MonoRDiff -> "[Right Difference Monotonicity]"
+    MonoSum -> "[Sum Monotonicity]"
+    MonoLDiv -> "[Left Division Monotonicity]"
+    MonoRDiv -> "[Right Division Monotonicity]"
+    RewriteL -> "[Left Rewrite]"
+    RewriteR -> "[Right Rewrite]"
+    (Res res) -> case res of
+      (Res1 _) -> "[Downward Residuation 1]"
+      (Res1i _) -> "[Upward Residuation 1]"
+      (Res2 _) -> "[Downward Residuation 2]"
+      (Res2i _) -> "[Upward Residuation 2]"
+
 {------------------------------------------------------------------------------}
 -- Datatypes for LGf sequents
 {------------------------------------------------------------------------------}
