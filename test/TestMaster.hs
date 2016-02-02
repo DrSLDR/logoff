@@ -3,7 +3,7 @@
 -- Actual unit testing frameworks are for scrubs
 -}
 
-module TestMaster
+module Main
       (
       main
       ) where
