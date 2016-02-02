@@ -14,12 +14,16 @@ category:            Language
 build-type:          Simple
 cabal-version:       >=1.8
 
+source-repository head
+  type: git
+  location: git://github.com/DrSLDR/logoff.git
+
 executable logoff
   main-is: Logoff.hs
   -- other-modules:
-  build-depends:       base ==4.6.*
+  build-depends:       base
 
 test-suite testsuite
   type:           exitcode-stdio-1.0
   main-is:        Testcases.hs
-  build-depends:  base ==4.6.*
+  build-depends:  base
