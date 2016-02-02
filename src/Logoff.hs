@@ -176,6 +176,50 @@ residuate2i 1 (Sequent z (SSum y x)) = Sequent (SLDiff y z) x
 residuate2i _ s = s
 
 {------------------------------------------------------------------------------}
+-- Rewrite block
+-- Note that if the functions can't treat the given sequent, they return it
+{------------------------------------------------------------------------------}
+-- rewriteL - rewrites tensor, left and right difference (structure to logical)
+rewriteL :: Sequent -> Sequent
+rewriteL (Sequent (STensor (IStruct x) (IStruct y)) o) =
+  Sequent (IStruct (P (Tensor x y))) o
+rewriteL (Sequent (SRDiff (IStruct x) (OStruct y)) o) =
+  Sequent (IStruct (P (RDiff x y))) o
+rewriteL (Sequent (SLDiff (OStruct x) (IStruct y)) o) =
+  Sequent (IStruct (P (LDiff x y))) o
+rewriteL s = s
+
+-- rewriteR - rewrites sum, left and right division (structure to logical)
+rewriteR :: Sequent -> Sequent
+rewriteR (Sequent i (SSum (OStruct x) (OStruct y))) =
+  Sequent i (OStruct (N (Sum x y)))
+rewriteR (Sequent i (SRDiv (OStruct x) (IStruct y))) =
+  Sequent i (OStruct (N (RDiv x y)))
+rewriteR (Sequent i (SLDiv (IStruct x) (OStruct y))) =
+  Sequent i (OStruct (N (LDiv x y)))
+rewriteR s = s
+
+-- rewriteLi - rewrites tensor, left and right difference (logical to structure)
+rewriteLi :: Sequent -> Sequent
+rewriteLi (Sequent (IStruct (P (Tensor x y))) o) =
+  Sequent (STensor (IStruct x) (IStruct y)) o
+rewriteLi (Sequent (IStruct (P (RDiff x y))) o) =
+  Sequent (SRDiff (IStruct x) (OStruct y)) o
+rewriteLi (Sequent (IStruct (P (LDiff x y))) o) =
+  Sequent (SLDiff (OStruct x) (IStruct y)) o
+rewriteLi s = s
+
+-- rewriteRi - rewrites sum, left and right division (logical to structure)
+rewriteRi :: Sequent -> Sequent
+rewriteRi (Sequent i (OStruct (N (Sum x y)))) =
+  Sequent i (SSum (OStruct x) (OStruct y))
+rewriteRi (Sequent i (OStruct (N (RDiv x y)))) =
+  Sequent i (SRDiv (OStruct x) (IStruct y))
+rewriteRi (Sequent i (OStruct (N (LDiv x y)))) =
+  Sequent i (SLDiv (IStruct x) (OStruct y))
+rewriteRi s = s
+
+{------------------------------------------------------------------------------}
 -- Top-Down solver block
 {------------------------------------------------------------------------------}
 -- tdSolve - Master Top-Down solver
