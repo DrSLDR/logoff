@@ -1,7 +1,8 @@
 # LoGoff
 Proof searcher for Focused Lambek-Grishin (LGf) calculus
 
-[![](https://travis-ci.org/DrSLDR/logoff.svg?branch=master)](https://travis-ci.org/DrSLDR/logoff)
+[![Build Status](https://travis-ci.org/DrSLDR/logoff.svg?branch=master)](https://travis-ci.org/DrSLDR/logoff)
+[![Coverage Status](https://coveralls.io/repos/github/DrSLDR/logoff/badge.svg?branch=master)](https://coveralls.io/github/DrSLDR/logoff?branch=master)
 
 ---
 
@@ -9,6 +10,7 @@ Proof searcher for Focused Lambek-Grishin (LGf) calculus
 
 - A functioning testing framework (v0.1)
 - Input parsing (v0.2)
+- Top-down solving, partial (v0.3)
 
 ## Planned features:
 
@@ -21,7 +23,7 @@ Proof searcher for Focused Lambek-Grishin (LGf) calculus
 
 - [ ] Datatype setup
   - [x] Fundamental LGf datatypes
-  - [ ] Proof-tree representation
+  - [x] Proof-tree representation
   - [ ] Lexicon representation
 - [x] Testing framework
   - [x] Fundamental testcases
