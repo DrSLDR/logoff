@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                logoff
-version:             0.3
+version:             1.0
 synopsis:            Proof searcher for Focused Lambek-Grishin (LGf) calculus
 -- description:
 license:             MIT

@@ -53,7 +53,6 @@ instance NiceShow ProofTree where
   niceShow (Binary s o pt1 pt2) = "(" ++ niceShow pt2 ++ " :R)=>\n" ++ "(" ++
     niceShow pt1 ++ " :L)=>\n" ++ niceShow o ++ " " ++ niceShow s
 
-
 instance NiceShow Operation where
   niceShow o = case o of
     DeFocusL -> "[Left Defocus]"

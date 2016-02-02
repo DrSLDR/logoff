@@ -10,12 +10,11 @@ Proof searcher for Focused Lambek-Grishin (LGf) calculus
 
 - A functioning testing framework (v0.1)
 - Input parsing (v0.2)
-- Top-down solving, partial (v0.3)
+- Top-down solving (v1.0)
+
 
 ## Planned features:
 
-- Top-down proof-tree construction
-- Proof-tree verification
 - Bottom-up proof derivation
 - MILL homomorphism
 
@@ -34,7 +33,7 @@ Proof searcher for Focused Lambek-Grishin (LGf) calculus
   - [x] Nicely formated output
   - [x] Input parsing
     - [ ] A (QuickCheck) testing suite for the parser (_an exercise for the reader_)
-- [ ] Top-down proofing algorithm
+- [x] Top-down proofing algorithm
 - There will be more...
 
 ---
