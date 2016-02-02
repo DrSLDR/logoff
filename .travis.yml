@@ -1,6 +1,12 @@
 language: haskell
+ghc: 7.8
 notifications:
   email: false
 
+script:
+  - cabal configure --enable-tests --enable-library-coverage && cabal build && cabal test
+
 after_script:
-  cat dist/test/logoff-*-testsuite.log
+  - cat dist/test/logoff-*-testsuite.log
+  - cabal install hpc-coveralls
+  - hpc-coveralls testsuite
