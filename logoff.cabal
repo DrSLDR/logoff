@@ -2,7 +2,7 @@
 -- documentation, see http://haskell.org/cabal/users-guide/
 
 name:                logoff
-version:             0.2
+version:             0.3
 synopsis:            Proof searcher for Focused Lambek-Grishin (LGf) calculus
 -- description:
 license:             MIT
@@ -17,9 +17,9 @@ cabal-version:       >=1.8
 executable logoff
   main-is: Logoff.hs
   -- other-modules:
-  build-depends:       base >=4.6.*
+  build-depends:       base ==4.6.*
 
 test-suite testsuite
   type:           exitcode-stdio-1.0
   main-is:        Testcases.hs
-  build-depends:  base >=4.6.*
+  build-depends:  base ==4.6.*
