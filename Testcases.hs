@@ -951,7 +951,7 @@ iMonoTests = [iMonoTensor_1, iMonoSum_1, iMonoLDiv_1, iMonoRDiv_1, iMonoLDiff_1,
 -- x+ |- (z- ./. y+) => (x+ .(x). y+) |- z-
 res1_1 :: Test
 res1_1 = ((==)
-  (residuate1
+  (residuate1 1
     (Sequent
       (IStruct (P (Positive "x")))
       (SRDiv
@@ -969,7 +969,7 @@ res1_1 = ((==)
 -- (x+ .(x). y+) |- z- => y+ |- (x+ .\\. z-)
 res1_2 :: Test
 res1_2 = ((==)
-  (residuate1
+  (residuate1 2
     (Sequent
       (STensor
         (IStruct (P (Positive "x")))
@@ -987,7 +987,7 @@ res1_2 = ((==)
 -- x+ |- (z- ./. y+) => y+ |- (x+ .\\. z-)
 res1_3 :: Test
 res1_3 = ((==)
-  ((residuate1 . residuate1)
+  ((residuate1 2 . residuate1 1)
     (Sequent
       (IStruct (P (Positive "x")))
       (SRDiv
@@ -1005,7 +1005,7 @@ res1_3 = ((==)
 -- y+ |- (x+ .\\. z-) => (x+ .(x). y+) |- z-
 res1i_1 :: Test
 res1i_1 = ((==)
-  (residuate1i
+  (residuate1i 2
     (Sequent
       (IStruct (P (Positive "y")))
       (SLDiv
@@ -1023,7 +1023,7 @@ res1i_1 = ((==)
 -- (x+ .(x). y+) |- z- => x+ |- (z- ./. y+)
 res1i_2 :: Test
 res1i_2 = ((==)
-  (residuate1i
+  (residuate1i 1
     (Sequent
       (STensor
         (IStruct (P (Positive "x")))
@@ -1041,7 +1041,7 @@ res1i_2 = ((==)
 -- y+ |- (x+ .\\. z-) => x+ |- (z- ./. y+)
 res1i_3 :: Test
 res1i_3 = ((==)
-  ((residuate1i . residuate1i)
+  ((residuate1i 1 . residuate1i 2)
     (Sequent
       (IStruct (P (Positive "y")))
       (SLDiv
@@ -1059,7 +1059,7 @@ res1i_3 = ((==)
 -- (y- .(\\). z-) |- x+ => z- |- (y- .(+). x+)
 res2_1 :: Test
 res2_1 = ((==)
-  (residuate2
+  (residuate2 1
     (Sequent
       (SLDiff
         (OStruct (N (Negative "y")))
@@ -1077,7 +1077,7 @@ res2_1 = ((==)
 -- z- |- (y- .(+). x+) => (z- .(/). x+) |- y-
 res2_2 :: Test
 res2_2 = ((==)
-  (residuate2
+  (residuate2 2
     (Sequent
       (IStruct (N (Negative "z")))
       (SSum
@@ -1095,7 +1095,7 @@ res2_2 = ((==)
 -- (y- .(\\). z-) |- x+ => (z- .(/). x+) |- y-
 res2_3 :: Test
 res2_3 = ((==)
-  ((residuate2 . residuate2)
+  ((residuate2 2 . residuate2 1)
     (Sequent
       (SLDiff
         (OStruct (N (Negative "y")))
@@ -1113,7 +1113,7 @@ res2_3 = ((==)
 -- (z- .(/). x+) |- y- => z- |- (y- .(+). x+)
 res2i_1 :: Test
 res2i_1 = ((==)
-  (residuate2i
+  (residuate2i 2
     (Sequent
       (SRDiff
         (IStruct (N (Negative "z")))
@@ -1131,7 +1131,7 @@ res2i_1 = ((==)
 -- z- |- (y- .(+). x+) => (y- .(\\). z-) |- x+
 res2i_2 :: Test
 res2i_2 = ((==)
-  (residuate2i
+  (residuate2i 1
     (Sequent
       (IStruct (N (Negative "z")))
       (SSum
@@ -1149,7 +1149,7 @@ res2i_2 = ((==)
 -- (z- .(/). x+) |- y- => (y- .(\\). z-) |- x+
 res2i_3 :: Test
 res2i_3 = ((==)
-  ((residuate2i . residuate2i)
+  ((residuate2i 1 . residuate2i 2)
     (Sequent
       (SRDiff
         (IStruct (N (Negative "z")))
