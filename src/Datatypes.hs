@@ -119,6 +119,8 @@ data Operation = DeFocusL
   | MonoSum
   | MonoLDiv
   | MonoRDiv
+  | RewriteL
+  | RewriteR
   | Res Residuation
   deriving (Show, Eq)
 

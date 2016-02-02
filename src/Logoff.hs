@@ -228,10 +228,12 @@ tdSolve :: Sequent -> Maybe ProofTree
 tdSolve s
   | isAx s = Just (Ax s)
   | isCoAx s = Just (CoAx s)
-  | otherwise = case tdSolveMono s of
-    Nothing -> case tdSolveFocus s of
-      Nothing -> case tdSolveRes tdSolveResHelperList s of
-        Nothing -> Nothing
+  | otherwise = case tdSolveRewrite s of
+    Nothing -> case tdSolveMono s of
+      Nothing -> case tdSolveFocus s of
+        Nothing -> case tdSolveRes tdSolveResHelperList s of
+          Nothing -> Nothing
+          pt -> pt
         pt -> pt
       pt -> pt
     pt -> pt
@@ -242,13 +244,27 @@ tdSolveHelperSpecial :: Residuation -> Sequent -> Maybe ProofTree
 tdSolveHelperSpecial res s
   | isAx s = Just (Ax s)
   | isCoAx s = Just (CoAx s)
-  | otherwise = case tdSolveMono s of
-    Nothing -> case tdSolveFocus s of
-      Nothing -> case tdSolveRes (tdSolveResHelperPermit res) s of
-        Nothing -> Nothing
+  | otherwise = case tdSolveRewrite s of
+    Nothing -> case tdSolveMono s of
+      Nothing -> case tdSolveFocus s of
+        Nothing -> case tdSolveRes (tdSolveResHelperPermit res) s of
+          Nothing -> Nothing
+          pt -> pt
         pt -> pt
       pt -> pt
     pt -> pt
+
+-- tdSolveRewrite - solves rewriting
+tdSolveRewrite :: Sequent -> Maybe ProofTree
+tdSolveRewrite s = let
+  list = [(rewriteLi, RewriteL), (rewriteRi, RewriteR)]
+  complist = map (\(f,o) -> (f s, o)) list
+  res = dropWhile (\(ns, _) -> s == ns) complist in
+  case res of
+    ((ns, o):_) -> case tdSolve ns of
+      (Just pt) -> Just (Unary s o pt)
+      otherwise -> Nothing
+    [] -> Nothing
 
 -- tdSolveFocus - solves focusing
 tdSolveFocus :: Sequent -> Maybe ProofTree
