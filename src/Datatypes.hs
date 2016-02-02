@@ -128,3 +128,12 @@ data Residuation = Res1 Int
   | Res2 Int
   | Res2i Int
   deriving (Show, Eq)
+
+{------------------------------------------------------------------------------}
+-- Testing specific datatypes
+{------------------------------------------------------------------------------}
+-- Testing datatype
+type Test = (Bool,Bool,String)
+
+-- Result datatype
+type Result = (Bool,String)

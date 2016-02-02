@@ -19,11 +19,13 @@ source-repository head
   location: git://github.com/DrSLDR/logoff.git
 
 executable logoff
+  hs-source-dirs: src
   main-is: Logoff.hs
   -- other-modules:
   build-depends:       base
 
 test-suite testsuite
+  hs-source-dirs: test src
   type:           exitcode-stdio-1.0
-  main-is:        Testcases.hs
+  main-is:        TestMaster.hs
   build-depends:  base
