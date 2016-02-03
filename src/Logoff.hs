@@ -91,13 +91,13 @@ monoLDiv l r = l
 
 -- Right division - introduces RDiv
 monoRDiv :: Sequent -> Sequent -> Sequent
-monoRDiv (Sequent xi (FOStruct xo)) (Sequent (FIStruct yi) yo) =
+monoRDiv (Sequent (FIStruct yi) yo) (Sequent xi (FOStruct xo)) =
   Sequent (FIStruct (N (RDiv yi xo))) (SRDiv yo xi)
 monoRDiv l r = l
 
 -- Left difference - introduces LDiff
 monoLDiff :: Sequent -> Sequent -> Sequent
-monoLDiff (Sequent xi (FOStruct xo)) (Sequent (FIStruct yi) yo) =
+monoLDiff (Sequent (FIStruct yi) yo) (Sequent xi (FOStruct xo)) =
   Sequent (SLDiff yo xi) (FOStruct (P (LDiff yi xo)))
 monoLDiff l r = l
 
@@ -132,13 +132,13 @@ iMonoLDiv s = (s,s)
 -- Right division - removes RDiv
 iMonoRDiv :: Sequent -> (Sequent, Sequent)
 iMonoRDiv (Sequent (FIStruct (N (RDiv yi xo))) (SRDiv yo xi)) =
-  (Sequent xi (FOStruct xo), Sequent (FIStruct yi) yo)
+  (Sequent (FIStruct yi) yo, Sequent xi (FOStruct xo))
 iMonoRDiv s = (s,s)
 
 -- Left difference - removes LDiff
 iMonoLDiff :: Sequent -> (Sequent, Sequent)
 iMonoLDiff (Sequent (SLDiff yo xi) (FOStruct (P (LDiff yi xo)))) =
-  (Sequent xi (FOStruct xo), Sequent (FIStruct yi) yo)
+  (Sequent (FIStruct yi) yo, Sequent xi (FOStruct xo))
 iMonoLDiff s = (s,s)
 
 -- Right difference - removes RDiff
@@ -327,3 +327,7 @@ tdSolveResHelperGetInverse (Res2i i) = Res2 i
 tdSolveResHelperList :: [(Sequent -> Sequent, Residuation)]
 tdSolveResHelperList = [(f i,o i) | (f,o) <- [(residuate1, Res1),
   (residuate2, Res2), (residuate1i, Res1i), (residuate2i, Res2i)], i <- [1,2]]
+
+{------------------------------------------------------------------------------}
+-- Bottom-up solver block
+{------------------------------------------------------------------------------}
