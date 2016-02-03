@@ -27,7 +27,6 @@ instance NiceShow NFormula where
 
 instance NiceShow IStructure where
   niceShow (IStruct f) = niceShow f
-  niceShow (FIStruct f) = "[" ++ niceShow f ++ "]"
   niceShow (STensor s1 s2) =
     "(" ++ niceShow s1 ++ " .(x). " ++ niceShow s2 ++ ")"
   niceShow (SRDiff s1 s2) =
@@ -37,13 +36,14 @@ instance NiceShow IStructure where
 
 instance NiceShow OStructure where
   niceShow (OStruct f) = niceShow f
-  niceShow (FOStruct f) = "[" ++ niceShow f ++ "]"
   niceShow (SSum s1 s2) = "(" ++ niceShow s1 ++ " .(+). " ++ niceShow s2 ++ ")"
   niceShow (SRDiv s1 s2) = "(" ++ niceShow s1 ++ " ./. " ++ niceShow s2 ++ ")"
   niceShow (SLDiv s1 s2) = "(" ++ niceShow s1 ++ " .\\. " ++ niceShow s2 ++ ")"
 
 instance NiceShow Sequent where
-  niceShow (Sequent is os) = niceShow is ++ " |- " ++ niceShow os
+  niceShow (Neutral is os) = niceShow is ++ " |- " ++ niceShow os
+  niceShow (LFocus f os) = "[" ++ niceShow f ++ "] |- " ++ niceShow os
+  niceShow (RFocus is f) = niceShow is ++ " |- [" ++ niceShow f ++ "]"
 
 instance NiceShow ProofTree where
   niceShow (Ax s) = niceShow s ++ " [Ax]"
@@ -99,7 +99,6 @@ data NFormula = Negative Atom
 
 -- Input structure datatype
 data IStructure = IStruct Formula
-  | FIStruct Formula
   | STensor IStructure IStructure
   | SRDiff IStructure OStructure
   | SLDiff OStructure IStructure
@@ -107,14 +106,15 @@ data IStructure = IStruct Formula
 
 -- Output structure datatype
 data OStructure = OStruct Formula
-  | FOStruct Formula
   | SSum OStructure OStructure
   | SRDiv OStructure IStructure
   | SLDiv IStructure OStructure
   deriving (Eq, Show)
 
 -- Sequent datatype
-data Sequent = Sequent IStructure OStructure
+data Sequent = Neutral IStructure OStructure
+  | LFocus Formula OStructure
+  | RFocus IStructure Formula
   deriving (Eq, Show)
 
 {------------------------------------------------------------------------------}

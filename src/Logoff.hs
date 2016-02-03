@@ -12,13 +12,13 @@ import Data.Maybe
 {------------------------------------------------------------------------------}
 -- isAx verifies if a sequent is an Ax-type axiom
 isAx :: Sequent -> Bool
-isAx (Sequent (IStruct (P (Positive i))) (FOStruct  (P (Positive o)))) =
+isAx (RFocus (IStruct (P (Positive i))) (P (Positive o))) =
   o == i
 isAx _ = False
 
 -- isCoAx verifies if a sequent is a CoAx-type axiom
 isCoAx :: Sequent -> Bool
-isCoAx (Sequent (FIStruct  (N (Negative i))) (OStruct (N (Negative o)))) =
+isCoAx (LFocus (N (Negative i)) (OStruct (N (Negative o)))) =
   o == i
 isCoAx _ = False
 
@@ -28,42 +28,42 @@ isCoAx _ = False
 {------------------------------------------------------------------------------}
 -- Defocus right (or top-down focus right)
 defocusR :: Sequent -> Sequent
-defocusR (Sequent i (FOStruct (P o))) = Sequent i (OStruct (P o))
+defocusR (RFocus i (P o)) = Neutral i (OStruct (P o))
 defocusR s = s
 
 -- Inverse defocus right (top-down focus right)
 idefocusR :: Sequent -> Sequent
-idefocusR (Sequent i (OStruct (P o))) = Sequent i (FOStruct (P o))
+idefocusR (Neutral i (OStruct (P o))) = RFocus i (P o)
 idefocusR s = s
 
 -- Defocus left (or top-down focus left)
 defocusL :: Sequent -> Sequent
-defocusL (Sequent (FIStruct (N i)) o) = Sequent (IStruct (N i)) o
+defocusL (LFocus (N i) o) = Neutral (IStruct (N i)) o
 defocusL s = s
 
 -- Inverse defocus left (top-down focus left)
 idefocusL :: Sequent -> Sequent
-idefocusL (Sequent (IStruct (N i)) o) = Sequent (FIStruct (N i)) o
+idefocusL (Neutral (IStruct (N i)) o) = LFocus (N i) o
 idefocusL s = s
 
 -- Focus right (or top-down defocus right)
 focusR :: Sequent -> Sequent
-focusR (Sequent i (OStruct (N o))) = Sequent i (FOStruct (N o))
+focusR (Neutral i (OStruct (N o))) = RFocus i (N o)
 focusR s = s
 
 -- Inverse focus right (top-down defocus right)
 ifocusR :: Sequent -> Sequent
-ifocusR (Sequent i (FOStruct (N o))) = Sequent i (OStruct (N o))
+ifocusR (RFocus i (N o)) = Neutral i (OStruct (N o))
 ifocusR s = s
 
 -- Focus left (or top-down defocus left)
 focusL :: Sequent -> Sequent
-focusL (Sequent (IStruct (P i)) o) = Sequent (FIStruct (P i)) o
+focusL (Neutral (IStruct (P i)) o) = LFocus (P i) o
 focusL s = s
 
 -- Inverse focus left (top-down defocus left)
 ifocusL :: Sequent -> Sequent
-ifocusL (Sequent (FIStruct (P i)) o) = Sequent (IStruct (P i)) o
+ifocusL (LFocus (P i) o) = Neutral (IStruct (P i)) o
 ifocusL s = s
 
 {------------------------------------------------------------------------------}
@@ -73,38 +73,35 @@ ifocusL s = s
 {------------------------------------------------------------------------------}
 -- Tensor - introduces tensor
 monoTensor :: Sequent -> Sequent -> Sequent
-monoTensor (Sequent xi (FOStruct xo)) (Sequent yi (FOStruct yo)) =
-  Sequent (STensor xi yi) (FOStruct (P (Tensor xo yo)))
+monoTensor (RFocus xi xo) (RFocus yi yo) =
+  RFocus (STensor xi yi) (P (Tensor xo yo))
 monoTensor l r = l
 
 -- Sum - introduces sum
 monoSum :: Sequent -> Sequent -> Sequent
-monoSum (Sequent (FIStruct xi) xo) (Sequent (FIStruct yi) yo) =
-  Sequent (FIStruct (N (Sum xi yi))) (SSum xo yo)
+monoSum (LFocus xi xo) (LFocus yi yo) = LFocus (N (Sum xi yi)) (SSum xo yo)
 monoSum l r = l
 
 -- Left division - introduces LDiv
 monoLDiv :: Sequent -> Sequent -> Sequent
-monoLDiv (Sequent xi (FOStruct xo)) (Sequent (FIStruct yi) yo) =
-  Sequent (FIStruct (N (LDiv xo yi))) (SLDiv xi yo)
+monoLDiv (RFocus xi xo) (LFocus yi yo) = LFocus (N (LDiv xo yi)) (SLDiv xi yo)
 monoLDiv l r = l
 
 -- Right division - introduces RDiv
 monoRDiv :: Sequent -> Sequent -> Sequent
-monoRDiv (Sequent (FIStruct yi) yo) (Sequent xi (FOStruct xo)) =
-  Sequent (FIStruct (N (RDiv yi xo))) (SRDiv yo xi)
+monoRDiv (LFocus yi yo) (RFocus xi xo) = LFocus (N (RDiv yi xo)) (SRDiv yo xi)
 monoRDiv l r = l
 
 -- Left difference - introduces LDiff
 monoLDiff :: Sequent -> Sequent -> Sequent
-monoLDiff (Sequent (FIStruct yi) yo) (Sequent xi (FOStruct xo)) =
-  Sequent (SLDiff yo xi) (FOStruct (P (LDiff yi xo)))
+monoLDiff (LFocus yi yo) (RFocus xi xo) =
+  RFocus (SLDiff yo xi) (P (LDiff yi xo))
 monoLDiff l r = l
 
 -- Right difference - introduces RDiff
 monoRDiff :: Sequent -> Sequent -> Sequent
-monoRDiff (Sequent xi (FOStruct xo)) (Sequent (FIStruct yi) yo) =
-  Sequent (SRDiff xi yo) (FOStruct (P (RDiff xo yi)))
+monoRDiff (RFocus xi xo) (LFocus yi yo) =
+  RFocus (SRDiff xi yo) (P (RDiff xo yi))
 monoRDiff l r = l
 
 {------------------------------------------------------------------------------}
@@ -113,38 +110,38 @@ monoRDiff l r = l
 {------------------------------------------------------------------------------}
 -- Tensor - removes tensor
 iMonoTensor :: Sequent -> (Sequent, Sequent)
-iMonoTensor (Sequent (STensor xi yi) (FOStruct (P (Tensor xo yo)))) =
-  (Sequent xi (FOStruct xo), Sequent yi (FOStruct yo))
+iMonoTensor (RFocus (STensor xi yi) (P (Tensor xo yo))) =
+  (RFocus xi xo, RFocus yi yo)
 iMonoTensor s = (s,s)
 
 -- Sum - removes sum
 iMonoSum :: Sequent -> (Sequent, Sequent)
-iMonoSum (Sequent (FIStruct (N (Sum xi yi))) (SSum xo yo)) =
-  (Sequent (FIStruct xi) xo, Sequent (FIStruct yi) yo)
+iMonoSum (LFocus (N (Sum xi yi)) (SSum xo yo)) =
+  (LFocus xi xo, LFocus yi yo)
 iMonoSum s = (s,s)
 
 -- Left division - removes LDiv
 iMonoLDiv :: Sequent -> (Sequent, Sequent)
-iMonoLDiv (Sequent (FIStruct (N (LDiv xo yi))) (SLDiv xi yo)) =
-  (Sequent xi (FOStruct xo), Sequent (FIStruct yi) yo)
+iMonoLDiv (LFocus (N (LDiv xo yi)) (SLDiv xi yo)) =
+  (RFocus xi xo, LFocus yi yo)
 iMonoLDiv s = (s,s)
 
 -- Right division - removes RDiv
 iMonoRDiv :: Sequent -> (Sequent, Sequent)
-iMonoRDiv (Sequent (FIStruct (N (RDiv yi xo))) (SRDiv yo xi)) =
-  (Sequent (FIStruct yi) yo, Sequent xi (FOStruct xo))
+iMonoRDiv (LFocus (N (RDiv yi xo)) (SRDiv yo xi)) =
+  (LFocus yi yo, RFocus xi xo)
 iMonoRDiv s = (s,s)
 
 -- Left difference - removes LDiff
 iMonoLDiff :: Sequent -> (Sequent, Sequent)
-iMonoLDiff (Sequent (SLDiff yo xi) (FOStruct (P (LDiff yi xo)))) =
-  (Sequent (FIStruct yi) yo, Sequent xi (FOStruct xo))
+iMonoLDiff (RFocus (SLDiff yo xi) (P (LDiff yi xo))) =
+  (LFocus yi yo, RFocus xi xo)
 iMonoLDiff s = (s,s)
 
 -- Right difference - removes RDiff
 iMonoRDiff :: Sequent -> (Sequent, Sequent)
-iMonoRDiff (Sequent (SRDiff xi yo) (FOStruct (P (RDiff xo yi)))) =
-  (Sequent xi (FOStruct xo), Sequent (FIStruct yi) yo)
+iMonoRDiff (RFocus (SRDiff xi yo) (P (RDiff xo yi))) =
+  (RFocus xi  xo, LFocus yi yo)
 iMonoRDiff s = (s,s)
 
 {------------------------------------------------------------------------------}
@@ -153,26 +150,26 @@ iMonoRDiff s = (s,s)
 {------------------------------------------------------------------------------}
 -- residuate1 - Downwards R1 rule
 residuate1 :: Int -> Sequent -> Sequent
-residuate1 1 (Sequent x (SRDiv z y)) = Sequent (STensor x y) z
-residuate1 2 (Sequent (STensor x y) z) = Sequent y (SLDiv x z)
+residuate1 1 (Neutral x (SRDiv z y)) = Neutral (STensor x y) z
+residuate1 2 (Neutral (STensor x y) z) = Neutral y (SLDiv x z)
 residuate1 _ s = s
 
 -- residuate1i - Upwards (inverted) R1 rule
 residuate1i :: Int -> Sequent -> Sequent
-residuate1i 2 (Sequent y (SLDiv x z)) = Sequent (STensor x y) z
-residuate1i 1 (Sequent (STensor x y) z) = Sequent x (SRDiv z y)
+residuate1i 2 (Neutral y (SLDiv x z)) = Neutral (STensor x y) z
+residuate1i 1 (Neutral (STensor x y) z) = Neutral x (SRDiv z y)
 residuate1i _ s = s
 
 -- residuate2 - Downwards R2 rule
 residuate2 :: Int -> Sequent -> Sequent
-residuate2 1 (Sequent (SLDiff y z) x) = Sequent z (SSum y x)
-residuate2 2 (Sequent z (SSum y x)) = Sequent (SRDiff z x) y
+residuate2 1 (Neutral (SLDiff y z) x) = Neutral z (SSum y x)
+residuate2 2 (Neutral z (SSum y x)) = Neutral (SRDiff z x) y
 residuate2 _ s = s
 
 -- residuate2i - Upwards (inverted) R2 rule
 residuate2i :: Int -> Sequent -> Sequent
-residuate2i 2 (Sequent (SRDiff z x) y) = Sequent z (SSum y x)
-residuate2i 1 (Sequent z (SSum y x)) = Sequent (SLDiff y z) x
+residuate2i 2 (Neutral (SRDiff z x) y) = Neutral z (SSum y x)
+residuate2i 1 (Neutral z (SSum y x)) = Neutral (SLDiff y z) x
 residuate2i _ s = s
 
 {------------------------------------------------------------------------------}
@@ -181,42 +178,42 @@ residuate2i _ s = s
 {------------------------------------------------------------------------------}
 -- rewriteL - rewrites tensor, left and right difference (structure to logical)
 rewriteL :: Sequent -> Sequent
-rewriteL (Sequent (STensor (IStruct x) (IStruct y)) o) =
-  Sequent (IStruct (P (Tensor x y))) o
-rewriteL (Sequent (SRDiff (IStruct x) (OStruct y)) o) =
-  Sequent (IStruct (P (RDiff x y))) o
-rewriteL (Sequent (SLDiff (OStruct x) (IStruct y)) o) =
-  Sequent (IStruct (P (LDiff x y))) o
+rewriteL (Neutral (STensor (IStruct x) (IStruct y)) o) =
+  Neutral (IStruct (P (Tensor x y))) o
+rewriteL (Neutral (SRDiff (IStruct x) (OStruct y)) o) =
+  Neutral (IStruct (P (RDiff x y))) o
+rewriteL (Neutral (SLDiff (OStruct x) (IStruct y)) o) =
+  Neutral (IStruct (P (LDiff x y))) o
 rewriteL s = s
 
 -- rewriteR - rewrites sum, left and right division (structure to logical)
 rewriteR :: Sequent -> Sequent
-rewriteR (Sequent i (SSum (OStruct x) (OStruct y))) =
-  Sequent i (OStruct (N (Sum x y)))
-rewriteR (Sequent i (SRDiv (OStruct x) (IStruct y))) =
-  Sequent i (OStruct (N (RDiv x y)))
-rewriteR (Sequent i (SLDiv (IStruct x) (OStruct y))) =
-  Sequent i (OStruct (N (LDiv x y)))
+rewriteR (Neutral i (SSum (OStruct x) (OStruct y))) =
+  Neutral i (OStruct (N (Sum x y)))
+rewriteR (Neutral i (SRDiv (OStruct x) (IStruct y))) =
+  Neutral i (OStruct (N (RDiv x y)))
+rewriteR (Neutral i (SLDiv (IStruct x) (OStruct y))) =
+  Neutral i (OStruct (N (LDiv x y)))
 rewriteR s = s
 
 -- rewriteLi - rewrites tensor, left and right difference (logical to structure)
 rewriteLi :: Sequent -> Sequent
-rewriteLi (Sequent (IStruct (P (Tensor x y))) o) =
-  Sequent (STensor (IStruct x) (IStruct y)) o
-rewriteLi (Sequent (IStruct (P (RDiff x y))) o) =
-  Sequent (SRDiff (IStruct x) (OStruct y)) o
-rewriteLi (Sequent (IStruct (P (LDiff x y))) o) =
-  Sequent (SLDiff (OStruct x) (IStruct y)) o
+rewriteLi (Neutral (IStruct (P (Tensor x y))) o) =
+  Neutral (STensor (IStruct x) (IStruct y)) o
+rewriteLi (Neutral (IStruct (P (RDiff x y))) o) =
+  Neutral (SRDiff (IStruct x) (OStruct y)) o
+rewriteLi (Neutral (IStruct (P (LDiff x y))) o) =
+  Neutral (SLDiff (OStruct x) (IStruct y)) o
 rewriteLi s = s
 
 -- rewriteRi - rewrites sum, left and right division (logical to structure)
 rewriteRi :: Sequent -> Sequent
-rewriteRi (Sequent i (OStruct (N (Sum x y)))) =
-  Sequent i (SSum (OStruct x) (OStruct y))
-rewriteRi (Sequent i (OStruct (N (RDiv x y)))) =
-  Sequent i (SRDiv (OStruct x) (IStruct y))
-rewriteRi (Sequent i (OStruct (N (LDiv x y)))) =
-  Sequent i (SLDiv (IStruct x) (OStruct y))
+rewriteRi (Neutral i (OStruct (N (Sum x y)))) =
+  Neutral i (SSum (OStruct x) (OStruct y))
+rewriteRi (Neutral i (OStruct (N (RDiv x y)))) =
+  Neutral i (SRDiv (OStruct x) (IStruct y))
+rewriteRi (Neutral i (OStruct (N (LDiv x y)))) =
+  Neutral i (SLDiv (IStruct x) (OStruct y))
 rewriteRi s = s
 
 {------------------------------------------------------------------------------}
