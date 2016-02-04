@@ -155,21 +155,23 @@ extract :: [(a,String)] -> a
 extract [] = error "Parser crash!"
 extract l = (fst . head) l
 
--- sequent is the top-level sequent parser
+-- sequent is the top-level sequent parser and handles focus
 sequent :: Parser Sequent
-sequent = Parser (\cs -> case apply instructure cs of
-  ((i,res):_) -> case apply (symb "|-") res of
-    ((_,res):_) -> case apply outstructure res of
-      ((o,_):_) -> let s = Sequent i o in [(s,"") | saneSeq s]
-      [] -> []
-    [] -> []
-  [] -> [])
-
--- saneSeq is a sanity check on parsed sequents
--- Specifically, it tests that the sequent isn't focused on both sides
-saneSeq :: Sequent -> Bool
-saneSeq (Sequent (FIStruct _) (FOStruct _)) = False
-saneSeq _ = True
+sequent = Parser (\cs -> case apply (focused formula) cs of
+  ((fi,res):_) -> case apply (symb "|-") res of -- focused input
+    ((_,res):_) -> case apply outstructure res of -- turnstile
+      ((o,_):_) -> [(LFocus fi o,"")] -- output structure
+      [] -> [] -- crash
+    [] -> [] -- crash
+  [] -> case apply instructure cs of -- not focused input
+    ((i,res):_) -> case apply (symb "|-") res of -- input structure
+      ((_,res):_) -> case apply (focused formula) res of -- turnstile
+        ((fo,_):_) -> [(RFocus i fo,"")] -- focused output
+        [] -> case apply outstructure res of -- not focused output
+          ((o,_):_) -> [(Neutral i o,"")] -- output structure
+          [] -> [] -- crash
+      [] -> [] -- crash
+    [] -> []) -- crash
 
 -- atom parses single- or multi-letter atoms and their polarity
 atom :: Parser Formula
@@ -218,81 +220,89 @@ bracket open p close = do
 nested :: Parser a -> Parser a
 nested p = bracket (symb "(") p (symb ")")
 
--- instructure starts parsing input structures and handles focus
+-- instructure parses input structures
 instructure :: Parser IStructure
-instructure = Parser (\cs -> case apply (focused formula) cs of
-  ((f,res):_) -> [(FIStruct f, res)]
-  [] -> case apply (symb "[") cs of
-    [] -> apply instructure2 cs
-    _ -> [] -- Thou shalt not focus structural formulas
-    )
-
--- instructure1 parses non-focused logical structures
-instructure1 :: Parser IStructure
-instructure1 = Parser (\cs -> case apply formula cs of
-  ((f,res):_) -> [(IStruct f,res)]
-  [] -> [])
-
--- instructure2 parses structural input-connectives
-instructure2 :: Parser IStructure
-instructure2 = Parser (\cs -> case
-  apply (instructure1 +++ nested instructure2) cs of
+instructure = Parser (\cs -> case
+  apply (instructureFormula +++ nested instructure) cs of
   ((l,res):_) -> case
     apply (symb ".(x)." +++ symb ".(/)." +++ symb ".(\\).") res of
-    [] -> [(l,res)] -- May be unneccesary nesting
     ((c,res):_) -> case c of
-      ".(x)." -> case apply (instructure1 +++ nested instructure2) res of
-        ((r,res):_) -> [(STensor l r,res)]
-        [] -> []
-      ".(/)." -> case apply outstructure2 res of
-        ((r,res):_) -> [(SRDiff l r,res)]
-        [] -> []
-      ".(\\)."-> case apply outstructure2 cs of
-        ((l,res):_) -> case apply (symb ".(\\).") res of
-          ((_,res):_) -> case
-            apply (instructure1 +++ nested instructure2) res of
-            ((r,res):_) -> [(SLDiff l r,res)]
-            [] -> []
-          [] -> []
-        [] -> []
+      ".(x)." -> apply (instructureTensor l) res
+      ".(/)." -> apply (instructureRDiff l) res
+      ".(\\)."-> apply instructureLDiff cs
+    [] -> [(l, res)] -- Possibly logical structure or nested structure
+  [] -> []) -- crash
+
+-- instructureFormula is a helper function that parses logical formulas
+instructureFormula :: Parser IStructure
+instructureFormula = Parser (\cs -> case apply formula cs of
+  ((f,res):_) -> [(IStruct f, res)]
+  [] -> [])
+
+-- instructureTensor is a helper function to parse structural tensor
+instructureTensor :: IStructure -> Parser IStructure
+instructureTensor l = Parser (\cs -> case
+  apply (instructureFormula +++ nested instructure) cs of
+  ((r,res):_) -> [(STensor l r, res)]
+  [] -> [])
+
+-- instructureRDiff is a helper function to parse structural right difference
+instructureRDiff :: IStructure -> Parser IStructure
+instructureRDiff l = Parser (\cs -> case apply outstructure cs of
+  ((r,res):_) -> [(SRDiff l r, res)]
+  [] -> [])
+
+-- instructureLDiff is a helper function to parse structural left difference
+instructureLDiff :: Parser IStructure
+instructureLDiff = Parser (\cs -> case apply outstructure cs of
+  ((l,res):_) -> case apply (symb ".(\\).") res of
+    ((_,res):_) -> case apply (instructureFormula +++ nested instructure) res of
+      ((r,res):_) -> [(SLDiff l r, res)]
+      [] -> []
+    [] -> []
   [] -> [])
 
 -- outstructure starts parsing output structures and handles focus
 outstructure :: Parser OStructure
-outstructure = Parser (\cs -> case apply (focused formula) cs of
-  ((f,res):_) -> [(FOStruct f, res)]
-  [] -> case apply (symb "[") cs of
-    [] -> apply outstructure2 cs
-    _ -> [] -- See above
-    )
+outstructure = Parser (\cs -> case
+  apply (outstructureFormula +++ nested outstructure) cs of
+  ((l,res):_) -> case
+    apply (symb ".(+)." +++ symb ".\\." +++ symb "./.") res of
+    ((c,res):_) -> case c of
+      ".(+)." -> apply (outstructureSum l) res
+      "./."   -> apply (outstructureRDiv l) res
+      ".\\."  -> apply outstructureLDiv cs
+    [] -> [(l, res)] -- Possibly logical structure or nested structure
+  [] -> []) -- crash
 
--- outstructure1 parses non-focused logical structures
-outstructure1 :: Parser OStructure
-outstructure1 = Parser (\cs -> case apply formula cs of
-  ((f,res):_) -> [(OStruct f,res)]
+-- outstructureFormula is a helper function that parses logical formulas
+outstructureFormula :: Parser OStructure
+outstructureFormula = Parser (\cs -> case apply formula cs of
+  ((f,res):_) -> [(OStruct f, res)]
   [] -> [])
 
--- outstructure2 parses structural output-connectives
-outstructure2 :: Parser OStructure
-outstructure2 = Parser (\cs -> case
-  apply (outstructure1 +++ nested outstructure2) cs of
-  ((l,res):_) -> case apply (symb ".(+)." +++ symb "./." +++ symb ".\\.") res of
-    [] -> [(l,res)] -- May be unneccesary nesting
-    ((c,res):_) -> case c of
-      ".(+)." -> case apply (outstructure1 +++ nested outstructure2) res of
-        ((r,res):_) -> [(SSum l r,res)]
-        [] -> []
-      "./." -> case apply instructure2 res of
-        ((r,res):_) -> [(SRDiv l r,res)]
-        [] -> []
-      ".\\."-> case apply instructure2 cs of -- re-parse
-        ((l,res):_) -> case apply (symb ".\\.") res of
-          ((_,res):_) -> case
-            apply (outstructure1 +++ nested outstructure2) res of
-            ((r,res):_) -> [(SLDiv l r,res)]
-            [] -> []
-          [] -> []
-        [] -> []
+-- outstructureSum is a helper function to parse structural sum
+outstructureSum :: OStructure -> Parser OStructure
+outstructureSum l = Parser (\cs -> case
+  apply (outstructureFormula +++ nested outstructure) cs of
+  ((r,res):_) -> [(SSum l r, res)]
+  [] -> [])
+
+-- outstructureRDiv is a helper function to parse structural right division
+outstructureRDiv :: OStructure -> Parser OStructure
+outstructureRDiv l = Parser (\cs -> case apply instructure cs of
+  ((r,res):_) -> [(SRDiv l r, res)]
+  [] -> [])
+
+-- outstructureLDiv is a helper function to parse structural left division
+outstructureLDiv :: Parser OStructure
+outstructureLDiv = Parser (\cs -> case apply instructure cs of
+  ((l,res):_) -> case apply (symb "./.") res of
+    ((_,res):_) -> case
+      apply (outstructureFormula +++ nested outstructure) res of
+      ((r,res):_) -> [(SLDiv l r, res)]
+      [] -> []
+    [] -> []
   [] -> [])
 
 -- focused is a parser-builder to determine id an input is focused
