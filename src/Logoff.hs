@@ -328,3 +328,242 @@ tdSolveResHelperList = [(f i,o i) | (f,o) <- [(residuate1, Res1),
 {------------------------------------------------------------------------------}
 -- Bottom-up solver block
 {------------------------------------------------------------------------------}
+-- buSolve - master bottom-up solver
+-- First argument is the target string/type pair. Second is the master Lexicon
+buSolve :: LexItem -> Lexicon -> Maybe ProofTree
+buSolve (ts, tt) le = let
+  le' = buDeriveLexicon (words ts) le
+  pps = buPartial le' in
+  case buCombine pps of
+    (Just (ps, pt)) -> case buCoerce tt pt of
+      (Just pt) -> let
+        s = buExtractSequent pt
+        s' = focusR s in
+        if s' /= s
+          then Just (Unary s' FocusR pt)
+          else Nothing
+      Nothing -> Nothing
+    Nothing -> Nothing
+
+-- buDeriveLexicon - Builds the relevant Lexicon for the given target
+buDeriveLexicon :: [String] -> Lexicon -> Lexicon
+buDeriveLexicon [] _ = []
+buDeriveLexicon (w:ws) ls = case buDeriveLexiconHelper w ls of
+  [] -> []
+  (l:_) -> l : buDeriveLexicon ws ls
+
+-- buDeriveLexiconHelper - Runs the lexicon for each word
+buDeriveLexiconHelper :: String -> Lexicon -> Lexicon
+buDeriveLexiconHelper "" _ = []
+buDeriveLexiconHelper _ [] = []
+buDeriveLexiconHelper w (l@(s,_):ls)
+  | w == s = [l]
+  | otherwise = buDeriveLexiconHelper w ls
+
+-- buPartial - Generates partial proof trees for the derived lexicon
+buPartial :: Lexicon -> [PartialProof]
+buPartial [] = []
+buPartial ((s,t):ls) = case tdSolve (buInsertionSequent t) of
+  (Just pt) -> (s,pt) : buPartial ls
+  Nothing -> []
+
+-- buInsertionSequent - Generates the "insertion sequent"; the point where a
+-- lexical term enters the proof tree
+buInsertionSequent :: Formula -> Sequent
+buInsertionSequent f = rewriteRi (Neutral (IStruct f) (OStruct f))
+
+-- buCombine - Combines the partial proofs to build a whole proof tree
+buCombine :: [PartialProof] -> Maybe PartialProof
+buCombine [] = Nothing
+buCombine [x] = Just x
+buCombine (l:r:xs) = case buCombinePair l r of
+  (Just p) -> buCombine (p:xs)
+  Nothing -> let
+    p = buCombine (r:xs)
+    in case p of
+      (Just p) -> buCombine (l:[p])
+      Nothing -> Nothing
+
+-- buCombinePair - Attempts to combine a pair of partial proofs
+buCombinePair :: PartialProof -> PartialProof -> Maybe PartialProof
+buCombinePair (ls, lt) (rs, rt) = if buHasInsertion lt || buHasInsertion rt
+  then case buCombinePairEval lt rt of
+    (Just pt) -> Just (ls ++ " " ++ rs, pt)
+    Nothing -> case buCombinePairEval rt lt of
+      (Just pt) -> Just (ls ++ " " ++ rs, pt)
+      Nothing -> Nothing
+  else Nothing
+
+-- buCombinePairEval - Tries to attach the right tree to the left tree
+buCombinePairEval :: ProofTree -> ProofTree -> Maybe ProofTree
+buCombinePairEval lt rt = let
+  ts = buCombineHelperGetType lt
+  in case buCombinePairCoerce ts rt of
+    (Just (pt, t)) -> case buCombinePairStitch t lt pt of
+      (Just pt) -> Just (buRehash pt)
+      Nothing -> Nothing
+    Nothing -> Nothing
+
+-- buCombinePairCoerce - Tries to coerce all insertion sequent types
+buCombinePairCoerce :: [Formula] -> ProofTree -> Maybe (ProofTree, Formula)
+buCombinePairCoerce [] _ = Nothing
+buCombinePairCoerce (t:ts) pt = case buCoerce t pt of
+  (Just pt) -> Just (pt, t)
+  Nothing -> buCombinePairCoerce ts pt
+
+-- buCombinePairStitch - Stitches the right tree into the left where the right
+-- left tree has an insertion sequent of the given type
+buCombinePairStitch :: Formula -> ProofTree -> ProofTree -> Maybe ProofTree
+buCombinePairStitch t (Unary x o (Unary s DeFocusL lt)) rt = if
+  buHelperExtractType s == Just t
+  then Just (Unary x o rt)
+  else case buCombinePairStitch t lt rt of
+    (Just pt) -> Just (Unary x o (Unary s DeFocusL pt))
+    Nothing -> Nothing
+buCombinePairStitch t (Unary x o (Unary s DeFocusR lt)) rt = if
+  buHelperExtractType s == Just t
+  then Just (Unary x o rt)
+  else case buCombinePairStitch t lt rt of
+    (Just pt) -> Just (Unary x o (Unary s DeFocusR pt))
+    Nothing -> Nothing
+buCombinePairStitch t (Unary x o pt) rt = case buCombinePairStitch t pt rt of
+  (Just pt) -> Just (Unary x o pt)
+  Nothing -> Nothing
+buCombinePairStitch t (Binary x o pt1 pt2) rt = case
+  buCombinePairStitch t pt1 rt of
+  (Just pt) -> Just (Binary x o pt pt2)
+  Nothing -> case buCombinePairStitch t pt2 rt of
+    (Just pt) -> Just (Binary x o pt1 pt)
+    Nothing -> Nothing
+buCombinePairStitch _ _ _ = Nothing
+
+-- buCombineHelperGetType - Gets the desired type of all insertion sequents
+buCombineHelperGetType :: ProofTree -> [Formula]
+buCombineHelperGetType (Unary _ _ (Unary s DeFocusL pt)) = case
+  buHelperExtractType s of
+  (Just t) -> t : buCombineHelperGetType pt
+  Nothing -> buCombineHelperGetType pt
+buCombineHelperGetType (Unary _ _ (Unary s DeFocusR pt)) = case
+    buHelperExtractType s of
+    (Just t) -> t : buCombineHelperGetType pt
+    Nothing -> buCombineHelperGetType pt
+buCombineHelperGetType (Unary _ _ pt) = buCombineHelperGetType pt
+buCombineHelperGetType (Binary _ _ pt1 pt2) = case
+  buCombineHelperGetType pt1 of
+  [] -> case buCombineHelperGetType pt2 of
+    [] -> []
+    l -> l
+  l -> l
+buCombineHelperGetType _ = []
+
+-- buHelperExtractType -- Extracts the type from the sequent
+buHelperExtractType :: Sequent -> Maybe Formula
+buHelperExtractType (Neutral _ (OStruct f)) = Just f
+buHelperExtractType _ = Nothing
+
+-- buHasInsertion - Recursively searches a proof tree for insertion sequents
+buHasInsertion :: ProofTree -> Bool
+buHasInsertion (Ax _) = False
+buHasInsertion (CoAx _) = False
+buHasInsertion (Unary _ _ (Unary _ DeFocusL _)) = True
+buHasInsertion (Unary _ _ (Unary _ DeFocusR _)) = True
+buHasInsertion (Unary _ _ pt) = buHasInsertion pt
+buHasInsertion (Binary _ _ pt1 pt2) = buHasInsertion pt1 || buHasInsertion pt2
+
+-- buCoerce - Attempts to force a proof tree to match a given type
+buCoerce :: Formula -> ProofTree -> Maybe ProofTree
+buCoerce t pt@(Unary s _ _) = case buCoerceTrivial t pt of
+  (Just pt) -> Just pt
+  otherwise -> let
+    complist = map (\(f, o) -> (f s, o)) tdSolveResHelperList
+    residuations = [(ns, o) | (ns,o) <- complist, ns /= s] in
+    case buCoerceEval t residuations of
+      (Just (s, res)) -> Just (Unary s (Res res) pt)
+      Nothing -> Nothing
+
+-- buCoerceTrivial - Tests if coercion is needed
+buCoerceTrivial :: Formula -> ProofTree -> Maybe ProofTree
+buCoerceTrivial t pt@(Unary s _ _) = case buHelperExtractType s of
+  (Just f) -> if f == t
+    then Just pt
+    else Nothing
+  otherwise -> Nothing
+
+-- buCoerceEval - Evaluates a list of residuations
+buCoerceEval :: Formula -> [(Sequent, Residuation)] ->
+  Maybe (Sequent, Residuation)
+buCoerceEval _ [] = Nothing
+buCoerceEval t ((s, res):xs) = case buHelperExtractType s of
+  (Just f) -> if f == t
+    then Just (s, res)
+    else buCoerceEval t xs
+  otherwise -> Nothing
+
+-- buRehash - Recursively rebuilds a proof tree to match combined trees
+buRehash :: ProofTree -> ProofTree
+buRehash pt = case pt of
+  Ax {} -> pt
+  CoAx {} -> pt
+  Unary {} -> buRehashUnary pt
+  Binary {} -> buRehashBinary pt
+
+-- buExtractSequent - Extracts the sequent from a proof-tree step
+buExtractSequent :: ProofTree -> Sequent
+buExtractSequent (Ax s) = s
+buExtractSequent (CoAx s) = s
+buExtractSequent (Unary s _ _) = s
+buExtractSequent (Binary s _ _ _) = s
+
+-- buRehashUnary - Rehashes unary steps in proof trees
+buRehashUnary :: ProofTree -> ProofTree
+buRehashUnary (Unary _ o pt) = let
+  pt' = buRehash pt
+  s = buExtractSequent pt' in
+  Unary (buRehashUnaryEval s o) o pt'
+
+-- buRehashUnaryEval - Evaluates new unary sequents
+buRehashUnaryEval :: Sequent -> Operation -> Sequent
+buRehashUnaryEval s o = case o of
+  DeFocusL -> defocusL s
+  DeFocusR -> defocusR s
+  FocusL -> focusL s
+  FocusR -> focusR s
+  RewriteL -> rewriteL s
+  RewriteR -> rewriteR s
+  (Res r) -> case r of
+    (Res1 i) -> residuate1 i s
+    (Res1i i) -> residuate1i i s
+    (Res2 i) -> residuate2 i s
+    (Res2i i) -> residuate2i i s
+
+-- buRehashBinary - Rehashes binary steps in proof trees
+buRehashBinary :: ProofTree -> ProofTree
+buRehashBinary (Binary _ o pt1 pt2) = let
+  pt1' = buRehash pt1
+  pt2' = buRehash pt2
+  l = buExtractSequent pt1'
+  r = buExtractSequent pt2' in
+  Binary (buRehashBinaryEval l r o) o pt1' pt2'
+
+-- buRehashBinaryEval - Evaluates new binary sequents
+buRehashBinaryEval :: Sequent -> Sequent -> Operation -> Sequent
+buRehashBinaryEval l r o = case o of
+  MonoTensor -> monoTensor l r
+  MonoLDiff -> monoLDiff l r
+  MonoRDiff -> monoRDiff l r
+  MonoSum -> monoSum l r
+  MonoLDiv -> monoLDiv l r
+  MonoRDiv -> monoRDiv l r
+
+{------------------------------------------------------------------------------}
+-- BOGUS SAMPLE BLOCK
+testLex :: Lexicon
+testLex = [("saint", N (Negative "n")),
+  ("popular", N (RDiv (N (Negative "n")) (N (Negative "n")))),
+  ("some", N (RDiv (N (Negative "np")) (N (Negative "n")))),
+  ("arrived", N (LDiv (N (Negative "np")) (N (Negative "s"))))]
+
+testGoal :: LexItem
+testGoal = ("some popular saint arrived", N (Negative "s"))
+
+{------------------------------------------------------------------------------}

@@ -126,6 +126,9 @@ type LexItem = (String, Formula)
 -- Lexicon type
 type Lexicon = [LexItem]
 
+-- Proof segment type
+type PartialProof = (String, ProofTree)
+
 {------------------------------------------------------------------------------}
 -- Datatypes for proof trees
 {------------------------------------------------------------------------------}
