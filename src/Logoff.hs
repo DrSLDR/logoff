@@ -554,16 +554,3 @@ buRehashBinaryEval l r o = case o of
   MonoSum -> monoSum l r
   MonoLDiv -> monoLDiv l r
   MonoRDiv -> monoRDiv l r
-
-{------------------------------------------------------------------------------}
--- BOGUS SAMPLE BLOCK
-testLex :: Lexicon
-testLex = [("saint", N (Negative "n")),
-  ("popular", N (RDiv (N (Negative "n")) (N (Negative "n")))),
-  ("some", N (RDiv (N (Negative "np")) (N (Negative "n")))),
-  ("arrived", N (LDiv (N (Negative "np")) (N (Negative "s"))))]
-
-testGoal :: LexItem
-testGoal = ("some popular saint arrived", N (Negative "s"))
-
-{------------------------------------------------------------------------------}

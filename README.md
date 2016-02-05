@@ -19,7 +19,7 @@ Proof searcher for Focused Lambek-Grishin (LGf) calculus
   - [x] Fundamental LGf datatypes
   - [x] Proof-tree representation
   - [x] Lexicon representation
-- [x] Testing framework
+- [ ] Testing framework (_Currently not maintained_)
   - [x] Fundamental testcases
   - [x] Verbose testing output
   - [x] "Easily" extensible framework
